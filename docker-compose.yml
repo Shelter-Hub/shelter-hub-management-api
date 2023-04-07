@@ -4,7 +4,7 @@ services:
   db:
       image: postgres:15.2
       ports:
-        - 5432:5432
+        - "5432:5432"
       restart: always
       volumes:
         - postgres-data:/data/postgres
