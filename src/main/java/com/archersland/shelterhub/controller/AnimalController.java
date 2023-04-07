@@ -14,7 +14,7 @@ import java.util.UUID;
 public class AnimalController {
 
     @Autowired
-    private final AnimalRepository animalRepository;
+    private AnimalRepository animalRepository;
 
     @GetMapping("{id}")
     public Optional<Animal> getAnimalById(@PathVariable UUID id) {
@@ -34,9 +34,7 @@ public class AnimalController {
     }
     @DeleteMapping("{id}")
     public void deleteAnimal(@PathVariable UUID id){
-        animalRepository.delete(id);
-    }
-
+        animalRepository.deleteById(id);
     }
 
 }

@@ -1,0 +1,16 @@
+---
+version: "3.9"
+services:
+  db:
+      image: postgres:15.2
+      ports:
+        - 5432:5432
+      restart: always
+      volumes:
+        - postgres-data:/data/postgres
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+volumes:
+  postgres-data:
+    driver: local

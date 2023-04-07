@@ -1,7 +1,6 @@
 package com.archersland.shelterhub.controller;
 
 import com.archersland.shelterhub.database.MedicalRecordsRepository;
-import com.archersland.shelterhub.domain.Animal;
 import com.archersland.shelterhub.domain.MedicalRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +11,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/medical-record")
-public class MedicalRecordsController {
+public class MedicalRecordController {
     @Autowired
-    private final MedicalRecordsRepository medicalRecordsRepository;
+    private MedicalRecordsRepository medicalRecordsRepository;
 
     @GetMapping
     public List<MedicalRecord> getAllMedicalRecords() {
@@ -33,7 +32,7 @@ public class MedicalRecordsController {
         if(id != null) medicalRecordsRepository.save(medicalRecord);
     }
     @DeleteMapping("{id}")
-    public void deleteMedicalRecord (@PathVariable UUID id){
-        medicalRecordsRepository.delete(id);
+    public void deleteMedicalRecord(@PathVariable UUID id){
+        medicalRecordsRepository.deleteById(id);
     }
 }
