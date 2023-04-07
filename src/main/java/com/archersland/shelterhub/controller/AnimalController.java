@@ -6,52 +6,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/animal")
 public class AnimalController {
-    private final AnimalRepository animalRepository;
+
     @Autowired
-    public AnimalController(AnimalRepository animalRepository) {
-        this.animalRepository = animalRepository;
+    private final AnimalRepository animalRepository;
+
+    @GetMapping("{id}")
+    public Optional<Animal> getAnimalById(@PathVariable UUID id) {
+        return animalRepository.findById(id);
     }
     @GetMapping
-    public List<Animal> getAllAnimals(@RequestBody Animal animal) {
+    public List<Animal> getAllAnimals() {
         return animalRepository.findAll();
     }
     @PostMapping
-    public void createAnimal(Animal animal){
+    public void createAnimal(@RequestBody Animal animal){
         animalRepository.save(animal);
     }
-    @PutMapping
-    public void updateAnimal(Animal animal){
-        if(animal.getId() != null) animalRepository.save(animal);
+    @PutMapping("{id}")
+    public void updateAnimal(@PathVariable UUID id, @RequestBody Animal animal){
+        if(id != null) animalRepository.save(animal);
     }
-    @DeleteMapping
-    public void deleteAnimal(Animal animal){
-        animalRepository.delete(animal);
+    @DeleteMapping("{id}")
+    public void deleteAnimal(@PathVariable UUID id){
+        animalRepository.delete(id);
     }
 
-
-
-//    @PostMapping("/animal")
-//    public Animal createAnimal(@RequestBody Animal animal) {
-//
-//    }
-//
-//    @GetMapping("animal/{id}")
-//    public Animal getAnimalById(@PathVariable UUID id) {
-//
-//    }
-//
-//    @PutMapping("/animal/{id}")
-//    public Animal updateAnimal(@PathVariable UUID id, @RequestBody Animal animal) {
-//
-//    }
-//
-//    @DeleteMapping("/animal/{id}")
-//    public void deleteAnimal(@PathVariable UUID id) {
-//
-//    }
+    }
 
 }
