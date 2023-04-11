@@ -1,4 +1,4 @@
-package com.archersland.shelterhub.domain;
+package com.shelterhub.domain;
 
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;

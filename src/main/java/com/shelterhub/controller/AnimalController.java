@@ -1,7 +1,7 @@
-package com.archersland.shelterhub.controller;
+package com.shelterhub.controller;
 
-import com.archersland.shelterhub.database.AnimalRepository;
-import com.archersland.shelterhub.domain.Animal;
+import com.shelterhub.database.AnimalRepository;
+import com.shelterhub.domain.Animal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

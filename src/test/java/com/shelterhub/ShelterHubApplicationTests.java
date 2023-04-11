@@ -1,4 +1,4 @@
-package com.archersland.shelterhub;
+package com.shelterhub;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

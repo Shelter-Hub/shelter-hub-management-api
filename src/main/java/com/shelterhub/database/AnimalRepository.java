@@ -1,6 +1,6 @@
-package com.archersland.shelterhub.database;
+package com.shelterhub.database;
 
-import com.archersland.shelterhub.domain.Animal;
+import com.shelterhub.domain.Animal;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

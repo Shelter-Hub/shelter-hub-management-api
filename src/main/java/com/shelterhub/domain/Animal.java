@@ -1,4 +1,4 @@
-package com.archersland.shelterhub.domain;
+package com.shelterhub.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;

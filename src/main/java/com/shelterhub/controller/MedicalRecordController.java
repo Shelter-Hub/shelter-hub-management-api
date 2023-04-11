@@ -1,7 +1,7 @@
-package com.archersland.shelterhub.controller;
+package com.shelterhub.controller;
 
-import com.archersland.shelterhub.database.MedicalRecordsRepository;
-import com.archersland.shelterhub.domain.MedicalRecord;
+import com.shelterhub.database.MedicalRecordsRepository;
+import com.shelterhub.domain.MedicalRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

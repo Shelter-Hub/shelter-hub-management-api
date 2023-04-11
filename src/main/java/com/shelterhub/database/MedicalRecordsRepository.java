@@ -1,6 +1,6 @@
-package com.archersland.shelterhub.database;
+package com.shelterhub.database;
 
-import com.archersland.shelterhub.domain.MedicalRecord;
+import com.shelterhub.domain.MedicalRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
