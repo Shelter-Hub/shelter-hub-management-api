@@ -18,7 +18,7 @@ public class AnimalController {
     @Autowired
     private AnimalFacade animalFacade;
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Optional<AnimalDTO> getAnimalById(@PathVariable UUID id) {
         return animalFacade.getAnimalById(id);
     }
@@ -30,11 +30,11 @@ public class AnimalController {
     public void createAnimal(@RequestBody AnimalDTO animal){
         animalFacade.create(animal);
     }
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public void updateAnimal(@PathVariable UUID id, @RequestBody AnimalDTO animal){
         if(id != null) animalFacade.update(animal, id);
     }
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public void deleteAnimal(@PathVariable UUID id){
         animalFacade.delete(id);
     }

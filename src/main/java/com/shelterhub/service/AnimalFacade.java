@@ -33,6 +33,7 @@ public class AnimalFacade {
         animalInDb.setAge(animalDTO.getAge());
         animalInDb.setAnimal_type(animalDTO.getAnimal_type());
         animalInDb.setMedical_record_id(animalDTO.getMedical_record_id());
+        animalRepository.save(animalInDb);
         return animalDTO;
     }
 
