@@ -1,8 +1,10 @@
 package com.shelterhub.controller;
 
-import com.shelterhub.database.AnimalRepository;
 import com.shelterhub.domain.Animal;
+import com.shelterhub.dto.AnimalDTO;
+import com.shelterhub.service.AnimalFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,31 +12,31 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/animal")
+@RequestMapping(value = "/animal", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AnimalController {
 
     @Autowired
-    private AnimalRepository animalRepository;
+    private AnimalFacade animalFacade;
 
     @GetMapping("{id}")
-    public Optional<Animal> getAnimalById(@PathVariable UUID id) {
-        return animalRepository.findById(id);
+    public Optional<AnimalDTO> getAnimalById(@PathVariable UUID id) {
+        return animalFacade.getAnimalById(id);
     }
     @GetMapping
-    public List<Animal> getAllAnimals() {
-        return animalRepository.findAll();
+    public List<AnimalDTO> getAllAnimals() {
+        return animalFacade.getAllAnimals();
     }
     @PostMapping
-    public void createAnimal(@RequestBody Animal animal){
-        animalRepository.save(animal);
+    public void createAnimal(@RequestBody AnimalDTO animal){
+        animalFacade.create(animal);
     }
     @PutMapping("{id}")
-    public void updateAnimal(@PathVariable UUID id, @RequestBody Animal animal){
-        if(id != null) animalRepository.save(animal);
+    public void updateAnimal(@PathVariable UUID id, @RequestBody AnimalDTO animal){
+        if(id != null) animalFacade.update(animal, id);
     }
     @DeleteMapping("{id}")
     public void deleteAnimal(@PathVariable UUID id){
-        animalRepository.deleteById(id);
+        animalFacade.delete(id);
     }
 
 }

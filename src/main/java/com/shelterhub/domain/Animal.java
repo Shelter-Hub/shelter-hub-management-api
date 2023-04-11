@@ -17,6 +17,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@Table(name = "animal")
 public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

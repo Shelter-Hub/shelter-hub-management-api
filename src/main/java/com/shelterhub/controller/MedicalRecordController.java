@@ -1,8 +1,9 @@
 package com.shelterhub.controller;
 
-import com.shelterhub.database.MedicalRecordsRepository;
-import com.shelterhub.domain.MedicalRecord;
+import com.shelterhub.dto.MedicalRecordDTO;
+import com.shelterhub.service.MedicalRecordFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,29 +11,30 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/medical-record")
+@RequestMapping(value = "/medical-record", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MedicalRecordController {
     @Autowired
-    private MedicalRecordsRepository medicalRecordsRepository;
+    private MedicalRecordFacade medicalRecordFacade;
 
     @GetMapping
-    public List<MedicalRecord> getAllMedicalRecords() {
-        return medicalRecordsRepository.findAll();
+    public List<MedicalRecordDTO> getAllMedicalRecords() {
+        return medicalRecordFacade.getAllMedicalRecords();
     }
     @GetMapping("{id}")
-    public Optional<MedicalRecord> getMedicalRecordsById(@PathVariable UUID id) {
-        return medicalRecordsRepository.findById(id);
+    public Optional<MedicalRecordDTO> getMedicalRecordsById(@PathVariable UUID id) {
+        return medicalRecordFacade.getMedicalRecordById(id);
     }
     @PostMapping
-    public void createMedicalRecord(@RequestBody MedicalRecord medicalRecord){
-        medicalRecordsRepository.save(medicalRecord);
+    public void createMedicalRecord(@RequestBody MedicalRecordDTO medicalRecord){
+        medicalRecordFacade.create(medicalRecord);
     }
     @PutMapping("{id}")
-    public void updateMedicalRecord(@PathVariable UUID id,  @RequestBody MedicalRecord medicalRecord){
-        if(id != null) medicalRecordsRepository.save(medicalRecord);
+    public void updateMedicalRecord(@PathVariable UUID id,
+                                    @RequestBody MedicalRecordDTO medicalRecord){
+        if(id != null) medicalRecordFacade.update(medicalRecord, id);
     }
     @DeleteMapping("{id}")
     public void deleteMedicalRecord(@PathVariable UUID id){
-        medicalRecordsRepository.deleteById(id);
+        medicalRecordFacade.delete(id);
     }
 }
