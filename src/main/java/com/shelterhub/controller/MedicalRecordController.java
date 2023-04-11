@@ -20,7 +20,7 @@ public class MedicalRecordController {
     public List<MedicalRecordDTO> getAllMedicalRecords() {
         return medicalRecordFacade.getAllMedicalRecords();
     }
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Optional<MedicalRecordDTO> getMedicalRecordsById(@PathVariable UUID id) {
         return medicalRecordFacade.getMedicalRecordById(id);
     }
@@ -28,12 +28,12 @@ public class MedicalRecordController {
     public void createMedicalRecord(@RequestBody MedicalRecordDTO medicalRecord){
         medicalRecordFacade.create(medicalRecord);
     }
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public void updateMedicalRecord(@PathVariable UUID id,
                                     @RequestBody MedicalRecordDTO medicalRecord){
         if(id != null) medicalRecordFacade.update(medicalRecord, id);
     }
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public void deleteMedicalRecord(@PathVariable UUID id){
         medicalRecordFacade.delete(id);
     }

@@ -27,6 +27,7 @@ public class MedicalRecordFacade {
     public MedicalRecordDTO update (MedicalRecordDTO medicalRecordDTO, UUID medicalRecordId){
         MedicalRecord medicalRecordInDb = medicalRecordsRepository.getReferenceById(medicalRecordId);
         medicalRecordInDb.setAnimal_id(medicalRecordDTO.getAnimal_id());
+        medicalRecordsRepository.save(medicalRecordInDb);
         return medicalRecordDTO;
     }
 
