@@ -1,6 +1,5 @@
 package com.shelterhub.controller;
 
-import com.shelterhub.domain.Animal;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.service.AnimalFacade;
 import org.springframework.beans.factory.annotation.Autowired;

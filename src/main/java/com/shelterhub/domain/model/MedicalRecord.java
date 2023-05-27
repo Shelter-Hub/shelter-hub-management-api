@@ -1,4 +1,4 @@
-package com.shelterhub.domain;
+package com.shelterhub.domain.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
