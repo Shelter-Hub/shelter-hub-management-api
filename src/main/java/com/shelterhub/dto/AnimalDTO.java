@@ -19,5 +19,4 @@ public class AnimalDTO {
     private String history;
     private Gender gender;
     private Size size;
-
 }

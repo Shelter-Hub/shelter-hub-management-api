@@ -14,6 +14,17 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
     networks:
       - postgres-compose-network
+  local-pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "postgres@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "postgres"
+    ports:
+      - "16543:80"
+    depends_on:
+      - local-postgres-compose
+    networks:
+      - postgres-compose-network
 
 
 
