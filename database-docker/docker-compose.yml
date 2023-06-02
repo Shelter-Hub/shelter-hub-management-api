@@ -31,22 +31,6 @@ services:
     networks:
       - postgres-compose-network
 
-
-#  db:
-#      image: postgres:15.2
-#      ports:
-#        - "5432:5432"
-#      restart: always
-#      volumes:
-#        - postgres-data:/data/postgres
-#      environment:
-#        - POSTGRES_USER=postgres
-#        - POSTGRES_PASSWORD=postgres
-#volumes:
-#  postgres-data:
-#    driver: local
-
-
 networks:
   postgres-compose-network:
     driver: bridge
