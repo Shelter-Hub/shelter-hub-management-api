@@ -1,7 +1,7 @@
 package com.shelterhub.service;
 
 import com.shelterhub.database.MedicalRecordsRepository;
-import com.shelterhub.domain.MedicalRecord;
+import com.shelterhub.domain.model.MedicalRecord;
 import com.shelterhub.dto.MedicalRecordDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.shelterhub.service;
 
 import com.shelterhub.database.AnimalRepository;
-import com.shelterhub.domain.Animal;
+import com.shelterhub.domain.model.Animal;
 import com.shelterhub.dto.AnimalDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
