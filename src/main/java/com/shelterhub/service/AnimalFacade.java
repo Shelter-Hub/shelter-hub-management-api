@@ -56,7 +56,7 @@ public class AnimalFacade {
             return "Animal not found";
         } else {
             animalRepository.deleteById(animalId);
-            return "Animal " + animalId + "was deleted successfully";
+            return "Animal " + animalId + " was deleted successfully";
         }
     }
 

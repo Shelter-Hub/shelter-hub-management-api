@@ -10,20 +10,18 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
-      - ./02_create_extensions.sql:/docker-entrypoint-initdb.d/02_create_extensions.sql
-      - ./03_create_animal.sql:/docker-entrypoint-initdb.d/03_create_animal.sql
-      - ./04_create_medical_records.sql:/docker-entrypoint-initdb.d/04_create_medical_records.sql
-      - ./05_alter_animal_fk.sql:/docker-entrypoint-initdb.d/05_alter_animal_fk.sql
-      - ./06_alter_medical_records_fk.sql:/docker-entrypoint-initdb.d/06_alter_medical_records_fk.sql.sql
       - ./postgres-data:/var/lib/postgresql/data
     networks:
       - postgres-compose-network
   local-pgadmin-compose:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: "postgres@gmail.com"
-      PGADMIN_DEFAULT_PASSWORD: "postgres"
+      - PGADMIN_DEFAULT_EMAIL=postgres@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=postgres
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+      - PGADMIN_CONFIG_ENABLE_SESSION_EXPIRATION=False
+      - PGADMIN_SERVER_JSON_FILE=/pgadmin4/servers.json
     ports:
       - "16543:80"
     depends_on:
