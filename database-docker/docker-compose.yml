@@ -31,6 +31,15 @@ services:
     networks:
       - postgres-compose-network
 
+  local-certificates-compose:
+    image: busybox
+    environment:
+      - CERT_PATH=${CERT_PATH}
+    volumes:
+        - ${CERT_PATH}:/certs
+    networks:
+      - postgres-compose-network
+
 networks:
   postgres-compose-network:
     driver: bridge
