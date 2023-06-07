@@ -35,4 +35,5 @@ build/
 
 ### SSL Key ###
 *.jks
+.env
 /certs
