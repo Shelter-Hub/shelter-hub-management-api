@@ -41,3 +41,5 @@ lombok.config
 *.env
 .env
 /certs
+
+postgres-data/
