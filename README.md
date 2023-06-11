@@ -1,7 +1,7 @@
 # Shelter Hub 🏠🐾
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/Shelter-Hub/SpringBoot_App/main/blob/page_12_shelter.jpg" alt="Apresentação do Pokédex" style="width: 100%">
+    <img src="https://raw.githubusercontent.com/Shelter-Hub/SpringBoot_App/main/blob/ShelterHub_GitHub_Panel.jpg" alt="Apresentação ShelterHub" style="width: 100%">
 </p>
 
 Shelter Hub is an open-source system for managing and keeping track of medical records of animals in shelters. It provides a comprehensive solution for animal registration, medical records management, and general information about the animals.
@@ -51,7 +51,14 @@ Shelter Hub is an open-source project, and contributions are welcome! If you hav
 
 ## Authors 👤
 
-This project is developed by a team of volunteers, including [Wagner Arcieri](https://github.com/wagarcdev). See the [contributors](https://github.com/your-project-url/contributors) page for more details.
+This project is developed by a team of volunteers, including:
+
+[Bernardo Gabriel](https://github.com/bgvit)
+[Igor Carvalho](https://github.com/idmcarvalho)
+[Igor Cruz](https://github.com/igorcruzf)
+[Wagner Arcieri](https://github.com/wagarcdev)
+
+See the [contributors](https://github.com/Shelter-Hub/contributors) page for more details.
 
 ## License 📝
 
