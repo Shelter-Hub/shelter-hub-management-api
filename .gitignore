@@ -32,3 +32,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Lombok Config ###
+lombok.config
+
+### SSL Key ###
+*.jks
+*.env
+.env
+/certs
+
+postgres-data/
