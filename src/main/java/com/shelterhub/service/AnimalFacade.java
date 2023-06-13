@@ -20,8 +20,8 @@ public class AnimalFacade {
         Animal animal = new Animal();
         animal.setName(animalDTO.getName());
         animal.setAge(animalDTO.getAge());
-        animal.setAnimal_type(animalDTO.getAnimal_type());
-        animal.setMedical_record_id(animalDTO.getMedical_record_id());
+        animal.setAnimalType(animalDTO.getAnimal_type());
+        animal.setMedicalRecordId(animalDTO.getMedical_record_id());
         animalRepository.save(animal);
         animalDTO.setId(animal.getId());
         return animalDTO;
@@ -31,8 +31,8 @@ public class AnimalFacade {
         Animal animalInDb = animalRepository.getReferenceById(animalId);
         animalInDb.setName(animalDTO.getName());
         animalInDb.setAge(animalDTO.getAge());
-        animalInDb.setAnimal_type(animalDTO.getAnimal_type());
-        animalInDb.setMedical_record_id(animalDTO.getMedical_record_id());
+        animalInDb.setAnimalType(animalDTO.getAnimal_type());
+        animalInDb.setMedicalRecordId(animalDTO.getMedical_record_id());
         animalRepository.save(animalInDb);
         return animalDTO;
     }
@@ -65,8 +65,8 @@ public class AnimalFacade {
         result.setId(animal.getId());
         result.setName(animal.getName());
         result.setAge(animal.getAge());
-        result.setAnimal_type(animal.getAnimal_type());
-        result.setMedical_record_id(animal.getMedical_record_id());
+        result.setAnimal_type(animal.getAnimalType());
+        result.setMedical_record_id(animal.getMedicalRecordId());
         return result;
     }
 }

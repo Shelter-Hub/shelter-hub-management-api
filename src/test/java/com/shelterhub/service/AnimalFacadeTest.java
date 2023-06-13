@@ -44,8 +44,8 @@ public class AnimalFacadeTest {
 
         assertEquals(animal.getName(), result.getName());
         assertEquals(animal.getAge(), result.getAge());
-        assertEquals(animal.getAnimal_type(), result.getAnimal_type());
-        assertEquals(animal.getMedical_record_id(), result.getMedical_record_id());
+        assertEquals(animal.getAnimalType(), result.getAnimal_type());
+        assertEquals(animal.getMedicalRecordId(), result.getMedical_record_id());
         verify(animalRepository, times(1)).save(any(Animal.class));
     }
 
@@ -134,8 +134,7 @@ public class AnimalFacadeTest {
         animal.setId(animalDTO.getId() != null ? animalDTO.getId() : UUID.randomUUID());
         animal.setName(animalDTO.getName());
         animal.setAge(animalDTO.getAge());
-        animal.setAnimal_type(animalDTO.getAnimal_type());
-        animal.setMedical_record_id(animalDTO.getMedical_record_id());
+        animal.setMedicalRecordId(animalDTO.getMedical_record_id());
         return animal;
     }
 }
