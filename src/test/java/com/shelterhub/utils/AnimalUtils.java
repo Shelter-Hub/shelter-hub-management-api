@@ -16,7 +16,7 @@ public class AnimalUtils {
         }
         animal.setName(faker.dog().name());
         animal.setAge((short) faker.number().numberBetween(1, 20));
-        animal.setAnimal_type(faker.animal().name());
+        animal.setAnimalType(faker.animal().name());
         animal.setBehavior(faker.dog().memePhrase());
         animal.setBreed(faker.dog().breed());
         animal.setIdentification(faker.dog().memePhrase());

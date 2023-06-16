@@ -21,12 +21,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class AnimalFacadeTest {
+public class AnimalServiceTest {
     @Mock
     private AnimalRepository animalRepository;
 
     @InjectMocks
-    private AnimalFacade animalFacade;
+    private AnimalService animalService;
 
     @BeforeEach
     void setUp() {
@@ -40,7 +40,7 @@ public class AnimalFacadeTest {
 
         when(animalRepository.save(any(Animal.class))).thenReturn(animal);
 
-        AnimalDTO result = animalFacade.create(animalDTO);
+        AnimalDTO result = animalService.create(animalDTO);
 
         assertEquals(animal.getName(), result.getName());
         assertEquals(animal.getAge(), result.getAge());
@@ -59,7 +59,7 @@ public class AnimalFacadeTest {
         when(animalRepository.getReferenceById(animalDTO.getId())).thenReturn(substitutedAnimal);
         when(animalRepository.save(any(Animal.class))).thenReturn(animal);
 
-        AnimalDTO result = animalFacade.update(animalDTO, animalDTO.getId());
+        AnimalDTO result = animalService.update(animalDTO, animalDTO.getId());
 
         assertEquals(animalDTO.getId(), result.getId());
         assertEquals(animalDTO.getName(), result.getName());
@@ -78,7 +78,7 @@ public class AnimalFacadeTest {
 
         when(animalRepository.findAll()).thenReturn(animals);
 
-        List<AnimalDTO> result = animalFacade.getAllAnimals();
+        List<AnimalDTO> result = animalService.getAllAnimals();
 
         assertEquals(animals.size(), result.size());
         verify(animalRepository, times(1)).findAll();
@@ -91,7 +91,7 @@ public class AnimalFacadeTest {
 
         when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.of(animal));
 
-        Optional<AnimalDTO> result = animalFacade.getAnimalById(animalDTO.getId());
+        Optional<AnimalDTO> result = animalService.getAnimalById(animalDTO.getId());
 
         assertEquals(animalDTO.getId(), result.get().getId());
         assertEquals(animalDTO.getName(), result.get().getName());
@@ -108,7 +108,7 @@ public class AnimalFacadeTest {
 
         when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.of(animal));
 
-        String result = animalFacade.delete(animalDTO.getId());
+        String result = animalService.delete(animalDTO.getId());
 
         verify(animalRepository, times(1)).deleteById(animalDTO.getId());
         verify(animalRepository, times(1)).findById(animalDTO.getId());
@@ -118,11 +118,10 @@ public class AnimalFacadeTest {
     @Test
     public void shouldNotDeleteAnimalIfAnimalNotFound() {
         AnimalDTO animalDTO = buildAnimalDTO(true);
-        Animal animal = buildAnimal(animalDTO);
 
         when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.empty());
 
-        String result = animalFacade.delete(animalDTO.getId());
+        String result = animalService.delete(animalDTO.getId());
 
         verify(animalRepository, times(0)).deleteById(animalDTO.getId());
         verify(animalRepository, times(1)).findById(animalDTO.getId());

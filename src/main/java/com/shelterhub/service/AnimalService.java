@@ -3,8 +3,8 @@ package com.shelterhub.service;
 import com.shelterhub.database.AnimalRepository;
 import com.shelterhub.domain.model.Animal;
 import com.shelterhub.dto.AnimalDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,48 +13,50 @@ import java.util.stream.Collectors;
 
 @Service
 public class AnimalService {
-    private final AnimalRepository animalRepository;
-    private final AnimalMapper animalMapper;
 
-    public AnimalService(AnimalRepository animalRepository, AnimalMapper animalMapper) {
-        this.animalRepository = animalRepository;
-        this.animalMapper = animalMapper;
-    }
+    @Autowired
+    private AnimalRepository animalRepository;
 
-    @Validated
-    public AnimalDTO create(AnimalDTO newAnimalDTO) {
-        Animal animal = animalMapper.convertToAnimal(new AnimalDTO());
+    public AnimalDTO create (AnimalDTO animalDTO){
+        Animal animal = new Animal();
+        animal.setName(animalDTO.getName());
+        animal.setAge(animalDTO.getAge());
+        animal.setAnimalType(animalDTO.getAnimalType());
+        animal.setMedicalRecordId(animalDTO.getMedicalRecordId());
         animalRepository.save(animal);
-        return newAnimalDTO;
-    }
-
-    public AnimalDTO update(AnimalDTO animalDTO, UUID animalId) {
-        Optional<Animal> optionalAnimal = animalRepository.findById(animalId);
-        if (optionalAnimal.isPresent()) {
-            Animal existingAnimal = optionalAnimal.get();
-            animalRepository.save(existingAnimal);
-        }
+        animalDTO.setId(animal.getId());
         return animalDTO;
     }
 
-    public List<AnimalDTO> getAllAnimals() {
-        return animalRepository.findAll()
+    public AnimalDTO update (AnimalDTO animalDTO, UUID animalId){
+        Animal animal = animalRepository.getReferenceById(animalId);
+        Animal animalToBePersisted = AnimalDTO.toAnimal(animalDTO);
+
+        animalRepository.save(animal);
+        return animalDTO;
+    }
+
+    public List<AnimalDTO> getAllAnimals () {
+        return animalRepository
+                .findAll()
                 .stream()
-                .map(animalMapper::convertToDto)
+                .map(Animal::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<AnimalDTO> getAnimalById(UUID animalId) {
-        return animalRepository.findById(animalId)
-                .map(animalMapper::convertToDto);
+    public Optional<AnimalDTO> getAnimalById (UUID animalId) {
+        return animalRepository
+                .findById(animalId)
+                .map(Animal::toDTO);
     }
 
-    public String delete(UUID animalId) {
-        Optional<Animal> optionalAnimal = animalRepository.findById(animalId);
-        if (optionalAnimal.isPresent()) {
+    public String delete (UUID animalId) {
+        Optional<Animal> animalInDb = animalRepository.findById(animalId);
+        if (animalInDb.isEmpty()) {
+            return "Animal not found";
+        } else {
             animalRepository.deleteById(animalId);
             return "Animal " + animalId + " was deleted successfully";
         }
-        return null;
     }
 }
