@@ -30,10 +30,12 @@ public class AnimalController {
     public Optional<AnimalDTO> getAnimalById(@PathVariable UUID id) {
         return animalService.getAnimalById(id);
     }
+
     @GetMapping
     public List<AnimalDTO> getAllAnimals() {
         return animalService.getAllAnimals();
     }
+
     @PostMapping
     public ResponseEntity<AnimalDTO> createAnimal(@RequestBody AnimalDTO animal){
         AnimalDTO createdAnimal = animalService.create(animal);
