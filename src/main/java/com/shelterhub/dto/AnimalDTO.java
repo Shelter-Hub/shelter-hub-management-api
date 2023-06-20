@@ -38,6 +38,22 @@ public class AnimalDTO {
             .size(animalDTO.getSize())
             .build();
     }
+
+    public static Animal toAnimalWithSameAnimalId(AnimalDTO animalDTO, UUID animalId) {
+        return Animal.builder()
+                .id(animalId)
+                .name(animalDTO.getName())
+                .identification(animalDTO.getIdentification())
+                .age(animalDTO.getAge())
+                .medicalRecordId(animalDTO.getMedicalRecordId())
+                .animalType(animalDTO.getAnimalType())
+                .behavior(animalDTO.getBehavior())
+                .breed(animalDTO.getBreed())
+                .history(animalDTO.getHistory())
+                .gender(animalDTO.getGender())
+                .size(animalDTO.getSize())
+                .build();
+    }
 }
 
 

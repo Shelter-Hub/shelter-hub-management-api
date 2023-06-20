@@ -2,6 +2,8 @@ package com.shelterhub.controller;
 
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.service.AnimalService;
+import jakarta.persistence.PersistenceException;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,16 +41,32 @@ public class AnimalController {
 
     @PostMapping
     public ResponseEntity<AnimalDTO> createAnimal(@RequestBody AnimalDTO animal){
-        AnimalDTO createdAnimal = animalService.create(animal);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAnimal);
+        try {
+            AnimalDTO createdAnimal = animalService.create(animal);
+
+            var location = URI.create(createdAnimal.getId().toString());
+
+            return ResponseEntity
+                    .created(location)
+                    .build();
+
+        } catch (Exception ex) {
+            // TODO() Fazer essa exception ser capturada no GlobalExceptionHandler
+            // E lá, retornar uma entidade apropriada
+            // as regras REST para o usuário como response
+            throw PersistenceException("teste", "1");
+        }
     }
     @PutMapping("/{id}")
     public void updateAnimal(@PathVariable UUID id, @RequestBody AnimalDTO animal){
         if(id != null) animalService.update(animal, id);
     }
     @DeleteMapping("/{id}")
-    public void deleteAnimal(@PathVariable UUID id){
-        animalService.delete(id);
+    public ResponseEntity<Void> deleteAnimal(@PathVariable UUID id){
+        var animalOptional = animalService.delete(id);
+
+        return animalOptional.isPresent() ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 
 }
