@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PersistenceFailedException.class)
     public ResponseEntity<ErrorResponse> handlePersistenceFailedException(PersistenceFailedException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "Invalid filling when trying to persist a new animal: " +
+                "Error while trying to persist a new animal: " +
                         ex.getLocalizedMessage()
         );
         return ResponseEntity.internalServerError().body(errorResponse);

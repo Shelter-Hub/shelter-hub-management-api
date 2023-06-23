@@ -101,24 +101,6 @@ public class AnimalServiceTest {
         verify(animalRepository, times(1)).findById(animalDTO.getId());
     }
 
-    /*
-    S
-    T
-    A
-    R
-    */
-
-    /*
-
-
-    Given - Contexto
-
-    /When - A situação que tá rolando
-
-
-    /Then - É o que esperado
-     */
-
     @Test
     public void shouldDeleteAnimal() {
         AnimalDTO animalDTO = buildAnimalDTO(true);
