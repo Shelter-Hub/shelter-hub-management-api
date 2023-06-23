@@ -1,8 +1,6 @@
 package com.shelterhub.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,4 +15,14 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.badRequest().body(errorResponse);
     }
+
+    @ExceptionHandler(PersistenceFailedException.class)
+    public ResponseEntity<ErrorResponse> handlePersistenceFailedException(PersistenceFailedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "Invalid filling when trying to persist a new animal: " +
+                        ex.getLocalizedMessage()
+        );
+        return ResponseEntity.internalServerError().body(errorResponse);
+    }
+
 }

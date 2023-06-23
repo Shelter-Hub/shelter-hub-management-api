@@ -1,7 +1,7 @@
 package com.shelterhub.exception;
 
 
-class PersistenceFailedException extends ErrorResponse {
+public class PersistenceFailedException extends RuntimeException {
 
     private String message;
 

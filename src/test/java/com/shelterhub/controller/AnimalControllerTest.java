@@ -2,6 +2,7 @@ package com.shelterhub.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import com.shelterhub.domain.model.Animal;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.service.AnimalService;
 import com.shelterhub.utils.AnimalUtils;
@@ -49,7 +50,7 @@ public class AnimalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(animalId.toString()))
-                .andExpect(jsonPath("$.animal_type").value(animalDTO.getAnimalType()))
+                .andExpect(jsonPath("$.animalType").value(animalDTO.getAnimalType()))
                 .andExpect(jsonPath("$.name").value(animalDTO.getName()))
                 .andExpect(jsonPath("$.age").value(animalDTO.getAge().intValue()));
 
@@ -70,11 +71,11 @@ public class AnimalControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(firstAnimal.getId().toString()))
-                .andExpect(jsonPath("$[0].animal_type").value(firstAnimal.getAnimalType()))
+                .andExpect(jsonPath("$[0].animalType").value(firstAnimal.getAnimalType()))
                 .andExpect(jsonPath("$[0].name").value(firstAnimal.getName()))
                 .andExpect(jsonPath("$[0].age").value(firstAnimal.getAge().intValue()))
                 .andExpect(jsonPath("$[1].id").value(secondAnimal.getId().toString()))
-                .andExpect(jsonPath("$[1].animal_type").value(secondAnimal.getAnimalType()))
+                .andExpect(jsonPath("$[1].animalType").value(secondAnimal.getAnimalType()))
                 .andExpect(jsonPath("$[1].name").value(secondAnimal.getName()))
                 .andExpect(jsonPath("$[1].age").value(secondAnimal.getAge().intValue()));
 
@@ -100,15 +101,22 @@ public class AnimalControllerTest {
     @SneakyThrows
     public void shouldCreateAnimal() {
         AnimalDTO animalDTO = buildAnimalDTO(false);
-        when(animalService.create(animalDTO)).thenReturn(animalDTO);
+        AnimalDTO animalResponseDTO = generateAnimalResponseDTO(animalDTO);
+        when(animalService.create(animalDTO)).thenReturn(animalResponseDTO);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/animal")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(new ObjectMapper().writeValueAsString(animalDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         verify(animalService, times(1)).create(animalDTO);
         verifyNoMoreInteractions(animalService);
+    }
+
+    private static AnimalDTO generateAnimalResponseDTO(AnimalDTO animalDTO) {
+        AnimalDTO animalResponseDTO = animalDTO;
+        animalResponseDTO.setId(UUID.randomUUID());
+        return animalResponseDTO;
     }
 
     @Test
@@ -180,7 +188,7 @@ public class AnimalControllerTest {
         when(animalService.delete(animalId)).thenReturn(optionalAnimalDTO);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/animal/{id}", animalId))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(animalService, times(1)).delete(animalId);
         verifyNoMoreInteractions(animalService);
