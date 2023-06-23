@@ -1,11 +1,9 @@
 package com.shelterhub.controller;
 
 import com.shelterhub.dto.AnimalDTO;
+import com.shelterhub.exception.PersistenceFailedException;
 import com.shelterhub.service.AnimalService;
-import jakarta.persistence.PersistenceException;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,10 +49,7 @@ public class AnimalController {
                     .build();
 
         } catch (Exception ex) {
-            // TODO() Fazer essa exception ser capturada no GlobalExceptionHandler
-            // E lá, retornar uma entidade apropriada
-            // as regras REST para o usuário como response
-            throw PersistenceException("teste", "1");
+            throw new PersistenceFailedException(ex.getLocalizedMessage());
         }
     }
     @PutMapping("/{id}")

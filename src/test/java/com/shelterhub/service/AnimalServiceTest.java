@@ -101,6 +101,24 @@ public class AnimalServiceTest {
         verify(animalRepository, times(1)).findById(animalDTO.getId());
     }
 
+    /*
+    S
+    T
+    A
+    R
+    */
+
+    /*
+
+
+    Given - Contexto
+
+    /When - A situação que tá rolando
+
+
+    /Then - É o que esperado
+     */
+
     @Test
     public void shouldDeleteAnimal() {
         AnimalDTO animalDTO = buildAnimalDTO(true);
@@ -108,11 +126,12 @@ public class AnimalServiceTest {
 
         when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.of(animal));
 
-        String result = animalService.delete(animalDTO.getId());
+        Animal result = animalService.delete(animalDTO.getId()).orElse(null);
 
         verify(animalRepository, times(1)).deleteById(animalDTO.getId());
         verify(animalRepository, times(1)).findById(animalDTO.getId());
-        assertEquals("Animal " + animalDTO.getId() + " was deleted successfully", result);
+        assertNotNull(result);
+        assertEquals(animalDTO.getId(), result.getId());
     }
 
     @Test
@@ -121,11 +140,11 @@ public class AnimalServiceTest {
 
         when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.empty());
 
-        String result = animalService.delete(animalDTO.getId());
+        Optional<Animal> result = animalService.delete(animalDTO.getId());
 
         verify(animalRepository, times(0)).deleteById(animalDTO.getId());
         verify(animalRepository, times(1)).findById(animalDTO.getId());
-        assertEquals("Animal not found", result);
+        assertTrue(result.isEmpty());
     }
 
     private Animal buildAnimal(AnimalDTO animalDTO) {

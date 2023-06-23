@@ -1,10 +1,9 @@
 package com.shelterhub.exception;
 
-import lombok.Data;
 
 class PersistenceFailedException extends ErrorResponse {
 
-    String code;
+    private String message;
 
     public PersistenceFailedException(String message) {
         super(message);

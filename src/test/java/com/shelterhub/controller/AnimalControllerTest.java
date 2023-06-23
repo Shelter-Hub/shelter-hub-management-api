@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.service.AnimalService;
+import com.shelterhub.utils.AnimalUtils;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,7 +174,10 @@ public class AnimalControllerTest {
         AnimalDTO animalDTO = buildAnimalDTO(true);
         UUID animalId = animalDTO.getId();
 
-        when(animalService.delete(animalId)).thenReturn("");
+        Optional<Animal> optionalAnimalDTO = Optional
+                .of(AnimalDTO.toAnimal(animalDTO));
+
+        when(animalService.delete(animalId)).thenReturn(optionalAnimalDTO);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/animal/{id}", animalId))
                 .andExpect(status().isOk());

@@ -3,8 +3,10 @@ package com.shelterhub.dto;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
 import com.shelterhub.domain.model.Animal;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
