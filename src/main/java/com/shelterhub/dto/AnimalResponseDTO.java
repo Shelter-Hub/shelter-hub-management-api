@@ -2,14 +2,15 @@ package com.shelterhub.dto;
 
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
-import com.shelterhub.domain.model.Animal;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.UUID;
 
 @Data
 @Builder
 public class AnimalResponseDTO {
+    private UUID id;
     private String name;
     private String identification;
     private Short age;

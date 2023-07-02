@@ -2,13 +2,13 @@ package com.shelterhub.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(InvalidFormatException.class)
     public ResponseEntity<ErrorResponse> handleInvalidFormatException(InvalidFormatException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handlePContraintViolationException(ConstraintViolationException ex) {
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
                 "Some constraint in the request was not validated well: " +
                         ex.getLocalizedMessage()
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePContraintViolationException() {
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException() {
         return ResponseEntity.notFound().build();
     }
 

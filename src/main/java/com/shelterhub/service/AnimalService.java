@@ -3,12 +3,13 @@ package com.shelterhub.service;
 import com.shelterhub.database.AnimalRepository;
 import com.shelterhub.domain.model.Animal;
 import com.shelterhub.dto.AnimalDTO;
+import com.shelterhub.dto.AnimalResponseDTO;
 import com.shelterhub.exception.PersistenceFailedException;
 import com.shelterhub.exception.ResourceNotFoundException;
-import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,51 +20,52 @@ public class AnimalService {
     @Autowired
     private AnimalRepository animalRepository;
 
-    public AnimalDTO create(AnimalDTO animalDTO) {
+    public AnimalResponseDTO create(AnimalDTO animalDTO){
         try {
-            var animalToBePersisted = AnimalDTO.toAnimal(animalDTO);
+            var animalToBePersisted = animalDTO.toAnimal();
             var createdAnimal = animalRepository.save(animalToBePersisted);
 
-            return Animal.toDTO(createdAnimal);
+            return createdAnimal.toResponse();
         } catch (Exception ex) {
             throw new PersistenceFailedException(ex.getLocalizedMessage());
         }
     }
 
-    public Animal updateById(AnimalDTO animalDTO, UUID animalId) {
+    public AnimalResponseDTO updateById(AnimalDTO animalDTO, UUID animalId) {
         Optional<Animal> animal = animalRepository.findById(animalId);
+        getAnimalIfPresent(animal);
 
-        if(animal.isPresent()) {
-            Animal animalEntity = AnimalDTO.toAnimal(animalDTO);
-            return animalRepository.save(animalEntity);
-        }
-
-        throw new ResourceNotFoundException();
+        Animal animalEntity = animalDTO.toAnimal();
+        var updatedAnimal = animalRepository.save(animalEntity);
+        return updatedAnimal.toResponse();
     }
 
-    public List<AnimalDTO> getAllAnimals() {
-        List<AnimalDTO> animals = new ArrayList<AnimalDTO>();
+    public List<AnimalResponseDTO> getAllAnimals() {
+        List<AnimalResponseDTO> animals = new ArrayList<>();
         var animalEntities = animalRepository.findAll();
 
         animalEntities.forEach( animal ->
-                animals.add(Animal.toDTO(animal))
+                animals.add(animal.toResponse())
         );
 
         return animals;
     }
 
-    public Optional<AnimalDTO> getAnimalById(UUID animalId) {
-        return animalRepository
-                .findById(animalId)
-                .map(Animal::toDTO);
+    public AnimalResponseDTO getAnimalById(UUID animalId) {
+        var animal = animalRepository
+                .findById(animalId);
+
+        return getAnimalIfPresent(animal).toResponse();
     }
 
-    public Optional<Animal> delete(UUID animalId) {
-        Optional<Animal> animal = animalRepository.findById(animalId);
-
+    public AnimalResponseDTO delete(UUID animalId) {
+        Optional<Animal> animalOrNull = animalRepository.findById(animalId);
+        var animal = getAnimalIfPresent(animalOrNull);
         animalRepository.deleteById(animalId);
+        return animal.toResponse();
+    }
 
-        return animal;
-
+    private Animal getAnimalIfPresent(Optional<Animal> animal) {
+        return animal.orElseThrow(ResourceNotFoundException::new);
     }
 }

@@ -23,19 +23,19 @@ public class AnimalDTO {
     private Gender gender;
     private Size size;
 
-    public static Animal toAnimal(AnimalDTO animalDTO) {
+    public Animal toAnimal() {
         return Animal.builder()
-            .id(animalDTO.getId())
-            .name(animalDTO.getName())
-            .identification(animalDTO.getIdentification())
-            .age(animalDTO.getAge())
-            .medicalRecordId(animalDTO.getMedicalRecordId())
-            .animalType(animalDTO.getAnimalType())
-            .behavior(animalDTO.getBehavior())
-            .breed(animalDTO.getBreed())
-            .history(animalDTO.getHistory())
-            .gender(animalDTO.getGender())
-            .size(animalDTO.getSize())
+            .id(getId())
+            .name(getName())
+            .identification(getIdentification())
+            .age(getAge())
+            .medicalRecordId(getMedicalRecordId())
+            .animalType(getAnimalType())
+            .behavior(getBehavior())
+            .breed(getBreed())
+            .history(getHistory())
+            .gender(getGender())
+            .size(getSize())
             .build();
     }
 }

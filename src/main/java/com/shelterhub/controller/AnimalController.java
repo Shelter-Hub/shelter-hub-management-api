@@ -1,8 +1,8 @@
 package com.shelterhub.controller;
 
 import com.shelterhub.dto.AnimalDTO;
+import com.shelterhub.dto.AnimalResponseDTO;
 import com.shelterhub.service.AnimalService;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -29,18 +28,18 @@ public class AnimalController {
     private AnimalService animalService;
 
     @GetMapping("/{id}")
-    public Optional<AnimalDTO> getAnimalById(@PathVariable UUID id) {
+    public AnimalResponseDTO getAnimalById(@PathVariable UUID id) {
         return animalService.getAnimalById(id);
     }
 
     @GetMapping
-    public List<AnimalDTO> getAllAnimals() {
+    public List<AnimalResponseDTO> getAllAnimals() {
         return animalService.getAllAnimals();
     }
 
     @PostMapping
-    public ResponseEntity<AnimalDTO> createAnimal(@RequestBody AnimalDTO animal) {
-            AnimalDTO createdAnimal = animalService.create(animal);
+    public ResponseEntity<AnimalResponseDTO> createAnimal(@RequestBody AnimalDTO animal) {
+            AnimalResponseDTO createdAnimal = animalService.create(animal);
 
             var id = createdAnimal.getId().toString();
             var location = URI.create(id);
@@ -52,18 +51,19 @@ public class AnimalController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updateAnimal(@PathVariable @NotNull UUID id, @RequestBody AnimalDTO animal) {
-        var animalEntity = animalService.updateById(animal, id);
-
-        return animalEntity != null ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<Void> updateAnimal(
+            @PathVariable UUID id,
+            @RequestBody AnimalDTO animal
+    ) {
+        animalService.updateById(animal, id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnimal(@PathVariable UUID id){
-        var animalOptional = animalService.delete(id);
+        animalService.delete(id);
 
-        return animalOptional.isPresent() ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

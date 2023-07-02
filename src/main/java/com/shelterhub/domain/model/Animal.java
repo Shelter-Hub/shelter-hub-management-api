@@ -38,35 +38,35 @@ public class Animal {
     private Gender gender;
     private Size size;
 
-    public static AnimalDTO toDTO(Animal animal) {
+    public AnimalDTO toDTO() {
         return AnimalDTO.builder()
-                .id(animal.getId())
-                .name(animal.getName())
-                .identification(animal.getIdentification())
-                .age(animal.getAge())
-                .medicalRecordId(animal.getMedicalRecordId())
-                .animalType(animal.getAnimalType())
-                .behavior(animal.getBehavior())
-                .breed(animal.getBreed())
-                .history(animal.getHistory())
-                .gender(animal.getGender())
-                .size(animal.getSize())
+                .id(getId())
+                .name(getName())
+                .identification(getIdentification())
+                .age(getAge())
+                .medicalRecordId(getMedicalRecordId())
+                .animalType(getAnimalType())
+                .behavior(getBehavior())
+                .breed(getBreed())
+                .history(getHistory())
+                .gender(getGender())
+                .size(getSize())
                 .build();
     }
 
-    public static AnimalResponseDTO toAnimalResponseDTO(Animal animal) {
+    public AnimalResponseDTO toResponse() {
         return AnimalResponseDTO.builder()
-                .name(animal.getName())
-                .identification(animal.getIdentification())
-                .age(animal.getAge())
-                .medicalRecordId(animal.getMedicalRecordId())
-                .animalType(animal.getAnimalType())
-                .behavior(animal.getBehavior())
-                .breed(animal.getBreed())
-                .history(animal.getHistory())
-                .gender(animal.getGender())
-                .size(animal.getSize())
+                .id(getId())
+                .name(getName())
+                .identification(getIdentification())
+                .age(getAge())
+                .medicalRecordId(getMedicalRecordId())
+                .animalType(getAnimalType())
+                .behavior(getBehavior())
+                .breed(getBreed())
+                .history(getHistory())
+                .gender(getGender())
+                .size(getSize())
                 .build();
     }
-
 }
