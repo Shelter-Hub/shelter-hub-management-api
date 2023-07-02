@@ -3,13 +3,15 @@ package com.shelterhub.service;
 import com.shelterhub.database.AnimalRepository;
 import com.shelterhub.domain.model.Animal;
 import com.shelterhub.dto.AnimalDTO;
+import com.shelterhub.exception.PersistenceFailedException;
+import com.shelterhub.exception.ResourceNotFoundException;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AnimalService {
@@ -18,27 +20,36 @@ public class AnimalService {
     private AnimalRepository animalRepository;
 
     public AnimalDTO create(AnimalDTO animalDTO) {
-        var animalToBePersisted = AnimalDTO.toAnimal(animalDTO);
-        var createdAnimal = animalRepository.save(animalToBePersisted);
+        try {
+            var animalToBePersisted = AnimalDTO.toAnimal(animalDTO);
+            var createdAnimal = animalRepository.save(animalToBePersisted);
 
-        return Animal.toDTO(createdAnimal);
+            return Animal.toDTO(createdAnimal);
+        } catch (Exception ex) {
+            throw new PersistenceFailedException(ex.getLocalizedMessage());
+        }
     }
 
-    public AnimalDTO update(AnimalDTO animalDTO, UUID animalId) {
-        Animal animal = animalRepository.getReferenceById(animalId);
+    public Animal updateById(AnimalDTO animalDTO, UUID animalId) {
+        Optional<Animal> animal = animalRepository.findById(animalId);
 
-        Animal animalToBePersisted = AnimalDTO.toAnimalWithSameAnimalId(animalDTO, animalId);
-        animalRepository.save(animalToBePersisted);
+        if(animal.isPresent()) {
+            Animal animalEntity = AnimalDTO.toAnimal(animalDTO);
+            return animalRepository.save(animalEntity);
+        }
 
-        return animalDTO;
+        throw new ResourceNotFoundException();
     }
 
     public List<AnimalDTO> getAllAnimals() {
-        return animalRepository
-                .findAll()
-                .stream()
-                .map(Animal::toDTO)
-                .collect(Collectors.toList());
+        List<AnimalDTO> animals = new ArrayList<AnimalDTO>();
+        var animalEntities = animalRepository.findAll();
+
+        animalEntities.forEach( animal ->
+                animals.add(Animal.toDTO(animal))
+        );
+
+        return animals;
     }
 
     public Optional<AnimalDTO> getAnimalById(UUID animalId) {

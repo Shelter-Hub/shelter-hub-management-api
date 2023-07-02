@@ -5,7 +5,6 @@ import com.github.javafaker.Faker;
 import com.shelterhub.domain.model.Animal;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.service.AnimalService;
-import com.shelterhub.utils.AnimalUtils;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,14 +164,14 @@ public class AnimalControllerTest {
         AnimalDTO animalDTO = buildAnimalDTO(true);
         UUID animalId = animalDTO.getId();
 
-        when(animalService.update(animalDTO, animalId)).thenReturn(animalDTO);
+        when(animalService.updateById(animalDTO, animalId)).thenReturn(AnimalDTO.toAnimal(animalDTO));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/animal/{id}", animalId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(animalDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
-        verify(animalService, times(1)).update(animalDTO, animalId);
+        verify(animalService, times(1)).updateById(animalDTO, animalId);
         verifyNoMoreInteractions(animalService);
     }
 

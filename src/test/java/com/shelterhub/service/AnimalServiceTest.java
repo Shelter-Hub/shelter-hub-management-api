@@ -15,7 +15,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.shelterhub.utils.AnimalUtils.buildAnimalDTO;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -56,10 +58,10 @@ public class AnimalServiceTest {
         Animal substitutedAnimal = buildAnimal(substitutedAnimalDTO);
         Animal animal = buildAnimal(animalDTO);
 
-        when(animalRepository.getReferenceById(animalDTO.getId())).thenReturn(substitutedAnimal);
+        when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.of(substitutedAnimal));
         when(animalRepository.save(any(Animal.class))).thenReturn(animal);
 
-        AnimalDTO result = animalService.update(animalDTO, animalDTO.getId());
+        Animal result = animalService.updateById(animalDTO, animalDTO.getId());
 
         assertEquals(animalDTO.getId(), result.getId());
         assertEquals(animalDTO.getName(), result.getName());
@@ -67,7 +69,7 @@ public class AnimalServiceTest {
         assertEquals(animalDTO.getAnimalType(), result.getAnimalType());
         assertEquals(animalDTO.getMedicalRecordId(), result.getMedicalRecordId());
         verify(animalRepository, times(1)).save(any(Animal.class));
-        verify(animalRepository, times(1)).getReferenceById(animalDTO.getId());
+        verify(animalRepository, times(1)).findById(animalDTO.getId());
     }
 
     @Test

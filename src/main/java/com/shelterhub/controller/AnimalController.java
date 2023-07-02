@@ -1,9 +1,10 @@
 package com.shelterhub.controller;
 
 import com.shelterhub.dto.AnimalDTO;
-import com.shelterhub.exception.PersistenceFailedException;
 import com.shelterhub.service.AnimalService;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,24 +39,25 @@ public class AnimalController {
     }
 
     @PostMapping
-    public ResponseEntity<AnimalDTO> createAnimal(@RequestBody AnimalDTO animal){
-        try {
+    public ResponseEntity<AnimalDTO> createAnimal(@RequestBody AnimalDTO animal) {
             AnimalDTO createdAnimal = animalService.create(animal);
 
-            var location = URI.create(createdAnimal.getId().toString());
+            var id = createdAnimal.getId().toString();
+            var location = URI.create(id);
 
             return ResponseEntity
-                    .created(location)
-                    .build();
+                    .status(HttpStatus.CREATED)
+                    .location(location)
+                    .body(createdAnimal);
+    }
 
-        } catch (Exception ex) {
-            throw new PersistenceFailedException(ex.getLocalizedMessage());
-        }
-    }
     @PutMapping("/{id}")
-    public void updateAnimal(@PathVariable UUID id, @RequestBody AnimalDTO animal){
-        if(id != null) animalService.update(animal, id);
+    public ResponseEntity updateAnimal(@PathVariable @NotNull UUID id, @RequestBody AnimalDTO animal) {
+        var animalEntity = animalService.updateById(animal, id);
+
+        return animalEntity != null ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnimal(@PathVariable UUID id){
         var animalOptional = animalService.delete(id);
