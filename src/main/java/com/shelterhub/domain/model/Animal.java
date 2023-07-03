@@ -2,24 +2,26 @@ package com.shelterhub.domain.model;
 
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
-import jakarta.persistence.*;
+import com.shelterhub.dto.AnimalDTO;
+import com.shelterhub.dto.AnimalResponseDTO;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.GenerationType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 import java.util.UUID;
-
-/** TODO CRUD Animal */
-
-// Criar a camada de Controller para Animal:
-//
-//- POST para criar animal
-//- PUT para editar um animal
-//- DELETE para deletar um animal
-//- GET para pegar 1 animal
-//- GET para pegar todos os animais
 
 @Entity
 @Data
-@Table(name = "animal")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table
 public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,17 +30,43 @@ public class Animal {
     private String name;
     private String identification;
     private Short age;
-    private UUID medical_record_id;
-    private String animal_type;
+    private UUID medicalRecordId;
+    private String animalType;
     private String behavior;
     private String breed;
     private String history;
     private Gender gender;
     private Size size;
 
-//    @ElementCollection
-//    private List<String> disabilities;
-//    @ElementCollection
-//    private List<String> observations;
+    public AnimalDTO toDTO() {
+        return AnimalDTO.builder()
+                .id(getId())
+                .name(getName())
+                .identification(getIdentification())
+                .age(getAge())
+                .medicalRecordId(getMedicalRecordId())
+                .animalType(getAnimalType())
+                .behavior(getBehavior())
+                .breed(getBreed())
+                .history(getHistory())
+                .gender(getGender())
+                .size(getSize())
+                .build();
+    }
 
+    public AnimalResponseDTO toResponse() {
+        return AnimalResponseDTO.builder()
+                .id(getId())
+                .name(getName())
+                .identification(getIdentification())
+                .age(getAge())
+                .medicalRecordId(getMedicalRecordId())
+                .animalType(getAnimalType())
+                .behavior(getBehavior())
+                .breed(getBreed())
+                .history(getHistory())
+                .gender(getGender())
+                .size(getSize())
+                .build();
+    }
 }

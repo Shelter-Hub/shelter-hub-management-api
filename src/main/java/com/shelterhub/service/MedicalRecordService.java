@@ -12,7 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class MedicalRecordFacade {
+public class MedicalRecordService {
     @Autowired
     private MedicalRecordsRepository medicalRecordsRepository;
 

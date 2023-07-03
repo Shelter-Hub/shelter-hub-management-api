@@ -1,9 +1,12 @@
 package com.shelterhub.controller;
 
 import com.shelterhub.dto.AnimalDTO;
-import com.shelterhub.service.AnimalFacade;
+import com.shelterhub.dto.AnimalResponseDTO;
+import com.shelterhub.service.AnimalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -22,27 +25,45 @@ import java.util.UUID;
 public class AnimalController {
 
     @Autowired
-    private AnimalFacade animalFacade;
+    private AnimalService animalService;
 
     @GetMapping("/{id}")
-    public Optional<AnimalDTO> getAnimalById(@PathVariable UUID id) {
-        return animalFacade.getAnimalById(id);
+    public AnimalResponseDTO getAnimalById(@PathVariable UUID id) {
+        return animalService.getAnimalById(id);
     }
+
     @GetMapping
-    public List<AnimalDTO> getAllAnimals() {
-        return animalFacade.getAllAnimals();
+    public List<AnimalResponseDTO> getAllAnimals() {
+        return animalService.getAllAnimals();
     }
+
     @PostMapping
-    public void createAnimal(@RequestBody AnimalDTO animal){
-        animalFacade.create(animal);
+    public ResponseEntity<AnimalResponseDTO> createAnimal(@RequestBody AnimalDTO animal) {
+            AnimalResponseDTO createdAnimal = animalService.create(animal);
+
+            var id = createdAnimal.getId().toString();
+            var location = URI.create(id);
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .location(location)
+                    .body(createdAnimal);
     }
+
     @PutMapping("/{id}")
-    public void updateAnimal(@PathVariable UUID id, @RequestBody AnimalDTO animal){
-        if(id != null) animalFacade.update(animal, id);
+    public ResponseEntity<Void> updateAnimal(
+            @PathVariable UUID id,
+            @RequestBody AnimalDTO animal
+    ) {
+        animalService.updateById(animal, id);
+        return ResponseEntity.noContent().build();
     }
+
     @DeleteMapping("/{id}")
-    public void deleteAnimal(@PathVariable UUID id){
-        animalFacade.delete(id);
+    public ResponseEntity<Void> deleteAnimal(@PathVariable UUID id){
+        animalService.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 }

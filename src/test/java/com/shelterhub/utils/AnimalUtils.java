@@ -10,19 +10,23 @@ import java.util.UUID;
 public class AnimalUtils {
     public static AnimalDTO buildAnimalDTO(boolean hasId) {
         Faker faker = new Faker();
-        AnimalDTO animal = new AnimalDTO();
+
+        var animalBuilder = AnimalDTO.builder();
+
         if(hasId) {
-            animal.setId(UUID.randomUUID());
+            animalBuilder.id(UUID.randomUUID());
         }
-        animal.setName(faker.dog().name());
-        animal.setAge((short) faker.number().numberBetween(1, 20));
-        animal.setAnimal_type(faker.animal().name());
-        animal.setBehavior(faker.dog().memePhrase());
-        animal.setBreed(faker.dog().breed());
-        animal.setIdentification(faker.dog().memePhrase());
-        animal.setHistory(faker.dog().memePhrase());
-        animal.setGender(Gender.FEMALE);
-        animal.setSize(Size.SMALL);
-        return animal;
+
+        return animalBuilder
+                .name(faker.dog().name())
+                .age((short) faker.number().numberBetween(1, 20))
+                .animalType(faker.animal().name())
+                .behavior(faker.dog().memePhrase())
+                .breed(faker.dog().breed())
+                .identification(faker.dog().memePhrase())
+                .history(faker.dog().memePhrase())
+                .gender(Gender.FEMALE)
+                .size(Size.SMALL)
+                .build();
     }
 }
