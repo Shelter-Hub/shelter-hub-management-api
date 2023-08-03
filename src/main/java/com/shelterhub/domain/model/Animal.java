@@ -1,5 +1,6 @@
 package com.shelterhub.domain.model;
 
+import com.shelterhub.domain.enums.AnimalType;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
 import com.shelterhub.dto.AnimalDTO;
@@ -31,26 +32,27 @@ public class Animal {
     @Column(nullable = false)
     private String name;
     private String identification;
-    private Short age;
-    private UUID medicalRecordId;
-    private String animalType;
     private String behavior;
     private String breed;
     private String history;
+    private LocalDate estimatedAge;
+    private UUID medicalRecordId;
+    private AnimalType animalType;
     private Gender gender;
     private Size size;
+
 
     public AnimalDTO toDTO() {
         return AnimalDTO.builder()
                 .id(getId())
                 .name(getName())
                 .identification(getIdentification())
-                .age(getAge())
-                .medicalRecordId(getMedicalRecordId())
-                .animalType(getAnimalType())
                 .behavior(getBehavior())
                 .breed(getBreed())
                 .history(getHistory())
+                .estimatedAgeDTO(toEstimatedDateDTO())
+                .medicalRecordId(getMedicalRecordId())
+                .animalType(String.valueOf(getAnimalType()))
                 .gender(getGender())
                 .size(getSize())
                 .build();
@@ -66,10 +68,7 @@ public class Animal {
                 .history(getHistory())
                 .estimatedAgeDTO(toEstimatedDateDTO())
                 .medicalRecordId(getMedicalRecordId())
-                .animalType(getAnimalType())
-                .behavior(getBehavior())
-                .breed(getBreed())
-                .history(getHistory())
+                .animalType(String.valueOf(getAnimalType()))
                 .gender(getGender())
                 .size(getSize())
                 .build();

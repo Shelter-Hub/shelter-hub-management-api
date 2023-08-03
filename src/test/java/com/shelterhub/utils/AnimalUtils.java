@@ -19,7 +19,8 @@ public class AnimalUtils {
 
         return animalBuilder
                 .name(faker.dog().name())
-                .age((short) faker.number().numberBetween(1, 20))
+                //.age((short) faker.number().numberBetween(1, 20))
+               //refatorar com estimatedAgeDTO retornando uma LocalDate fake
                 .animalType(faker.animal().name())
                 .behavior(faker.dog().memePhrase())
                 .breed(faker.dog().breed())

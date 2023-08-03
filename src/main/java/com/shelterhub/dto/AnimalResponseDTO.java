@@ -13,7 +13,7 @@ public class AnimalResponseDTO {
     private UUID id;
     private String name;
     private String identification;
-    private Short age;
+    private EstimatedAgeDTO estimatedAgeDTO;
     private UUID medicalRecordId;
     private String animalType;
     private String behavior;
