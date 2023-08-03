@@ -1,5 +1,6 @@
 package com.shelterhub.dto;
 
+import com.shelterhub.domain.enums.AnimalType;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
 import com.shelterhub.domain.model.Animal;
@@ -30,7 +31,7 @@ public class AnimalDTO {
             .identification(getIdentification())
             .age(getAge())
             .medicalRecordId(getMedicalRecordId())
-            .animalType(getAnimalType())
+            .animalType(AnimalType.valueOf(animalType))
             .behavior(getBehavior())
             .breed(getBreed())
             .history(getHistory())

@@ -4,16 +4,18 @@ import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.dto.AnimalResponseDTO;
+import com.shelterhub.dto.EstimatedAgeDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -59,7 +61,10 @@ public class Animal {
                 .id(getId())
                 .name(getName())
                 .identification(getIdentification())
-                .age(getAge())
+                .behavior(getBehavior())
+                .breed(getBreed())
+                .history(getHistory())
+                .estimatedAgeDTO(toEstimatedDateDTO())
                 .medicalRecordId(getMedicalRecordId())
                 .animalType(getAnimalType())
                 .behavior(getBehavior())
@@ -67,6 +72,18 @@ public class Animal {
                 .history(getHistory())
                 .gender(getGender())
                 .size(getSize())
+                .build();
+    }
+
+    private EstimatedAgeDTO toEstimatedDateDTO() {
+        var year = this.estimatedAge.getYear();
+        var month = this.estimatedAge.getDayOfMonth();
+        var day = this.estimatedAge.getDayOfYear();
+
+        return EstimatedAgeDTO.builder()
+                .days(day)
+                .months(month)
+                .years(year)
                 .build();
     }
 }
