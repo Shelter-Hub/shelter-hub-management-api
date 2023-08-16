@@ -3,7 +3,6 @@ package com.shelterhub.domain.model;
 import com.shelterhub.domain.enums.AnimalType;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
-import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.dto.AnimalResponseDTO;
 import com.shelterhub.dto.EstimatedAgeDTO;
 import jakarta.persistence.Entity;
@@ -40,23 +39,6 @@ public class Animal {
     private AnimalType animalType;
     private Gender gender;
     private Size size;
-
-
-    public AnimalDTO toDTO() {
-        return AnimalDTO.builder()
-                .id(getId())
-                .name(getName())
-                .identification(getIdentification())
-                .behavior(getBehavior())
-                .breed(getBreed())
-                .history(getHistory())
-                .estimatedAgeDTO(toEstimatedDateDTO())
-                .medicalRecordId(getMedicalRecordId())
-                .animalType(String.valueOf(getAnimalType()))
-                .gender(getGender())
-                .size(getSize())
-                .build();
-    }
 
     public AnimalResponseDTO toResponse() {
         return AnimalResponseDTO.builder()

@@ -6,6 +6,7 @@ import com.shelterhub.domain.enums.Size;
 import com.shelterhub.domain.model.Animal;
 import lombok.Builder;
 import lombok.Data;
+import org.apache.commons.lang3.EnumUtils;
 
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class AnimalDTO {
             .identification(getIdentification())
             .estimatedAge(estimatedAgeDTO.toEstimatedAge())
             .medicalRecordId(getMedicalRecordId())
-            .animalType(AnimalType.valueOf(animalType))
+            .animalType(EnumUtils.getEnum(AnimalType.class, getAnimalType(), AnimalType.Unknown))
             .behavior(getBehavior())
             .breed(getBreed())
             .history(getHistory())

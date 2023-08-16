@@ -1,6 +1,7 @@
 package com.shelterhub.utils;
 
 import com.github.javafaker.Faker;
+import com.shelterhub.domain.enums.AnimalType;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
 import com.shelterhub.dto.AnimalDTO;
@@ -19,9 +20,8 @@ public class AnimalUtils {
 
         return animalBuilder
                 .name(faker.dog().name())
-                //.age((short) faker.number().numberBetween(1, 20))
-               //refatorar com estimatedAgeDTO retornando uma LocalDate fake
-                .animalType(faker.animal().name())
+                .estimatedAgeDTO(EstimatedAgeDTO.builder().years(2).months(5).days(20).build())
+                .animalType(AnimalType.Canine.toString())
                 .behavior(faker.dog().memePhrase())
                 .breed(faker.dog().breed())
                 .identification(faker.dog().memePhrase())

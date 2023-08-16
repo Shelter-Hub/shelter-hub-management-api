@@ -47,7 +47,7 @@ public class AnimalControllerTest {
                 .andExpect(jsonPath("$.id").value(animalId.toString()))
                 .andExpect(jsonPath("$.animalType").value(animalDTO.getAnimalType()))
                 .andExpect(jsonPath("$.name").value(animalDTO.getName()))
-                .andExpect(jsonPath("$.age").value(animalDTO.getAge().intValue()));
+                .andExpect(jsonPath("$.estimatedAgeDTO").value(animalDTO.getEstimatedAgeDTO()));
 
         verify(animalService, times(1)).getAnimalById(animalId);
         verifyNoMoreInteractions(animalService);
@@ -90,11 +90,11 @@ public class AnimalControllerTest {
                 .andExpect(jsonPath("$[0].id").value(firstAnimal.getId().toString()))
                 .andExpect(jsonPath("$[0].animalType").value(firstAnimal.getAnimalType()))
                 .andExpect(jsonPath("$[0].name").value(firstAnimal.getName()))
-                .andExpect(jsonPath("$[0].age").value(firstAnimal.getAge().intValue()))
+                .andExpect(jsonPath("$.estimatedAgeDTO").value(firstAnimal.getEstimatedAgeDTO()))
                 .andExpect(jsonPath("$[1].id").value(secondAnimal.getId().toString()))
                 .andExpect(jsonPath("$[1].animalType").value(secondAnimal.getAnimalType()))
                 .andExpect(jsonPath("$[1].name").value(secondAnimal.getName()))
-                .andExpect(jsonPath("$[1].age").value(secondAnimal.getAge().intValue()));
+                .andExpect(jsonPath("$.estimatedAgeDTO").value(secondAnimal.getEstimatedAgeDTO()));
 
         verify(animalService, times(1)).getAllAnimals();
         verifyNoMoreInteractions(animalService);
@@ -130,7 +130,7 @@ public class AnimalControllerTest {
                 .andExpect(jsonPath("$.id").value(animalResponseDTO.getId().toString()))
                 .andExpect(jsonPath("$.animalType").value(animalDTO.getAnimalType()))
                 .andExpect(jsonPath("$.name").value(animalDTO.getName()))
-                .andExpect(jsonPath("$.age").value(animalDTO.getAge().intValue()));
+                .andExpect(jsonPath("$.estimatedAgeDTO").value(animalDTO.getEstimatedAgeDTO()));;
 
         verify(animalService, times(1)).create(animalDTO);
         verifyNoMoreInteractions(animalService);

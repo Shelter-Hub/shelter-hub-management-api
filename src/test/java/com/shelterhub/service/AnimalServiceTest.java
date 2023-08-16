@@ -162,7 +162,7 @@ public class AnimalServiceTest {
     private static void assertAnimalDTO(AnimalDTO animalDTO, AnimalResponseDTO result) {
         assertAll(
                 () -> assertEquals(animalDTO.getName(), result.getName()),
-                () -> assertEquals(animalDTO.getAge(), result.getAge()),
+                () -> assertEquals(animalDTO.getEstimatedAgeDTO(), result.getEstimatedAgeDTO()),
                 () -> assertEquals(animalDTO.getAnimalType(), result.getAnimalType()),
                 () -> assertEquals(animalDTO.getMedicalRecordId(), result.getMedicalRecordId())
         );
