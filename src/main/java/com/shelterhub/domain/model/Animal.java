@@ -48,23 +48,11 @@ public class Animal {
                 .behavior(getBehavior())
                 .breed(getBreed())
                 .history(getHistory())
-                .estimatedAgeDTO(toEstimatedDateDTO())
+                .estimatedAge(getEstimatedAge())
                 .medicalRecordId(getMedicalRecordId())
                 .animalType(String.valueOf(getAnimalType()))
                 .gender(getGender())
                 .size(getSize())
-                .build();
-    }
-
-    private EstimatedAgeDTO toEstimatedDateDTO() {
-        var year = this.estimatedAge.getYear();
-        var month = this.estimatedAge.getDayOfMonth();
-        var day = this.estimatedAge.getDayOfYear();
-
-        return EstimatedAgeDTO.builder()
-                .days(day)
-                .months(month)
-                .years(year)
                 .build();
     }
 }

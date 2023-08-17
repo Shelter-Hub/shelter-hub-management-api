@@ -5,6 +5,7 @@ import com.shelterhub.domain.enums.AnimalType;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
 import com.shelterhub.dto.AnimalDTO;
+import com.shelterhub.dto.EstimatedAgeDTO;
 
 import java.util.UUID;
 
