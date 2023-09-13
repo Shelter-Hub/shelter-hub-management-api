@@ -1,27 +1,46 @@
 package com.shelterhub.service;
 
 import com.shelterhub.database.AnimalRepository;
+import com.shelterhub.domain.enums.AnimalType;
+import com.shelterhub.domain.enums.Gender;
+import com.shelterhub.domain.enums.Size;
 import com.shelterhub.domain.model.Animal;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.dto.AnimalResponseDTO;
+import com.shelterhub.dto.EstimatedAgeDTO;
+import com.shelterhub.exception.InvalidValueException;
 import com.shelterhub.exception.PersistenceFailedException;
 import com.shelterhub.exception.ResourceNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import org.apache.commons.lang3.ObjectUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.shelterhub.utils.AnimalUtils.buildAnimalDTO;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +57,7 @@ public class AnimalServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
     @Test
     public void shouldReturnCreatedAnimalDTO() {
         AnimalDTO animalDTO = buildAnimalDTO(false);
@@ -48,6 +68,21 @@ public class AnimalServiceTest {
 
         assertAnimalDTO(animalDTO, result);
         verify(animalRepository, times(1)).save(any(Animal.class));
+    }
+
+
+    @Test
+    public void shouldThrowsInvalidValueExceptionWhenAnimalTypeIsNullOrEmpty() {
+        AnimalDTO animalDTO = buildAnimalDTO(false, "");
+
+        assertThrowsExactly(
+                InvalidValueException.class,
+                () -> animalService.create(animalDTO)
+        );
+
+        animalService.create(animalDTO);
+
+        verify(animalRepository, times(0)).save(any(Animal.class));
     }
 
     @Test
@@ -87,11 +122,11 @@ public class AnimalServiceTest {
         when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.empty());
 
         assertThrows(
-            ResourceNotFoundException.class,
-            () -> animalService.updateById(
-                animalDTO,
-                animalDTO.getId()
-            )
+                ResourceNotFoundException.class,
+                () -> animalService.updateById(
+                        animalDTO,
+                        animalDTO.getId()
+                )
         );
         verify(animalRepository, times(1)).findById(animalDTO.getId());
     }

@@ -31,4 +31,26 @@ public class AnimalUtils {
                 .size(Size.SMALL)
                 .build();
     }
+
+    public static AnimalDTO buildAnimalDTO(boolean hasId, String animalType) {
+        Faker faker = new Faker();
+
+        var animalBuilder = AnimalDTO.builder();
+
+        if(hasId) {
+            animalBuilder.id(UUID.randomUUID());
+        }
+
+        return animalBuilder
+                .name(faker.dog().name())
+                .estimatedAgeDTO(EstimatedAgeDTO.builder().years(2).months(5).days(20).build())
+                .animalType(animalType)
+                .behavior(faker.dog().memePhrase())
+                .breed(faker.dog().breed())
+                .identification(faker.dog().memePhrase())
+                .history(faker.dog().memePhrase())
+                .gender(Gender.FEMALE)
+                .size(Size.SMALL)
+                .build();
+    }
 }
