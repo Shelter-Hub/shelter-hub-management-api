@@ -5,6 +5,7 @@ import com.shelterhub.domain.enums.Size;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -13,7 +14,7 @@ public class AnimalResponseDTO {
     private UUID id;
     private String name;
     private String identification;
-    private Short age;
+    private LocalDate estimatedAge;
     private UUID medicalRecordId;
     private String animalType;
     private String behavior;

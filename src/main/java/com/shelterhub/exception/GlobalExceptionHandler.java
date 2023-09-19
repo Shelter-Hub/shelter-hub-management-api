@@ -18,6 +18,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
+    @ExceptionHandler(InvalidValueException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidValueException(InvalidValueException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "Invalid value provided for the enum: " +
+                        ex.getLocalizedMessage()
+        );
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+
     @ExceptionHandler(PersistenceFailedException.class)
     public ResponseEntity<ErrorResponse> handlePersistenceFailedException(PersistenceFailedException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -30,7 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "Some constraint in the request was not validated well: " +
+                "Some constraint in the request was not properly validated: " +
                         ex.getLocalizedMessage()
         );
         return ResponseEntity.badRequest().body(errorResponse);

@@ -4,8 +4,10 @@ import com.shelterhub.database.AnimalRepository;
 import com.shelterhub.domain.model.Animal;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.dto.AnimalResponseDTO;
+import com.shelterhub.exception.InvalidValueException;
 import com.shelterhub.exception.PersistenceFailedException;
 import com.shelterhub.exception.ResourceNotFoundException;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +22,14 @@ public class AnimalService {
     @Autowired
     private AnimalRepository animalRepository;
 
-    public AnimalResponseDTO create(AnimalDTO animalDTO){
+    public AnimalResponseDTO create(AnimalDTO animalDTO) {
+        if (ObjectUtils.isEmpty(animalDTO.getAnimalType())) {
+            throw new InvalidValueException("animalType cannot be empty or null.");
+        }
+
         try {
             var animalToBePersisted = animalDTO.toAnimal();
             var createdAnimal = animalRepository.save(animalToBePersisted);
-
             return createdAnimal.toResponse();
         } catch (Exception ex) {
             throw new PersistenceFailedException(ex.getLocalizedMessage());

@@ -1,10 +1,12 @@
 package com.shelterhub.dto;
 
+import com.shelterhub.domain.enums.AnimalType;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
 import com.shelterhub.domain.model.Animal;
 import lombok.Builder;
 import lombok.Data;
+import org.apache.commons.lang3.EnumUtils;
 
 import java.util.UUID;
 
@@ -14,7 +16,7 @@ public class AnimalDTO {
     private UUID id;
     private String name;
     private String identification;
-    private Short age;
+    private EstimatedAgeDTO estimatedAgeDTO;
     private UUID medicalRecordId;
     private String animalType;
     private String behavior;
@@ -28,9 +30,9 @@ public class AnimalDTO {
             .id(getId())
             .name(getName())
             .identification(getIdentification())
-            .age(getAge())
+            .estimatedAge(estimatedAgeDTO.toEstimatedAge())
             .medicalRecordId(getMedicalRecordId())
-            .animalType(getAnimalType())
+            .animalType(EnumUtils.getEnum(AnimalType.class, getAnimalType(), AnimalType.Unknown))
             .behavior(getBehavior())
             .breed(getBreed())
             .history(getHistory())
