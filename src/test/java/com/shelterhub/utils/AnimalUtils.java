@@ -1,11 +1,11 @@
 package com.shelterhub.utils;
 
-import com.github.javafaker.Faker;
 import com.shelterhub.domain.enums.AnimalType;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.dto.EstimatedAgeDTO;
+import net.datafaker.Faker;
 
 import java.util.UUID;
 
@@ -15,7 +15,7 @@ public class AnimalUtils {
 
         var animalBuilder = AnimalDTO.builder();
 
-        if(hasId) {
+        if (hasId) {
             animalBuilder.id(UUID.randomUUID());
         }
 
@@ -37,7 +37,7 @@ public class AnimalUtils {
 
         var animalBuilder = AnimalDTO.builder();
 
-        if(hasId) {
+        if (hasId) {
             animalBuilder.id(UUID.randomUUID());
         }
 

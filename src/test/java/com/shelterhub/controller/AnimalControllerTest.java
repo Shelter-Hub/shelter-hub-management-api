@@ -1,12 +1,12 @@
 package com.shelterhub.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javafaker.Faker;
 import com.shelterhub.dto.AnimalDTO;
 import com.shelterhub.dto.AnimalResponseDTO;
 import com.shelterhub.exception.ResourceNotFoundException;
 import com.shelterhub.service.AnimalService;
 import lombok.SneakyThrows;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -127,8 +127,8 @@ public class AnimalControllerTest {
         when(animalService.create(animalDTO)).thenReturn(animalResponseDTO);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/animal")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(animalDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(animalDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(animalResponseDTO.getId().toString()))
@@ -206,9 +206,9 @@ public class AnimalControllerTest {
         when(animalService.updateById(animalDTO, animalId)).thenThrow(ResourceNotFoundException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/animal/{id}", animalId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(animalDTO))
-                ).andExpect(status().isNotFound());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(animalDTO))
+        ).andExpect(status().isNotFound());
 
         verify(animalService, times(1)).updateById(animalDTO, animalId);
         verifyNoMoreInteractions(animalService);

@@ -3,6 +3,8 @@ package com.shelterhub.service;
 import com.shelterhub.database.MedicalRecordsRepository;
 import com.shelterhub.domain.model.MedicalRecord;
 import com.shelterhub.dto.MedicalRecordDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,9 @@ public class MedicalRecordService {
     @Autowired
     private MedicalRecordsRepository medicalRecordsRepository;
 
-    public MedicalRecordDTO create (MedicalRecordDTO medicalRecordDTO){
+    private static Logger log = LoggerFactory.getLogger(MedicalRecordService.class);
+
+    public MedicalRecordDTO create(MedicalRecordDTO medicalRecordDTO) {
         MedicalRecord medicalRecord = new MedicalRecord();
         medicalRecord.setAnimal_id(medicalRecordDTO.getAnimal_id());
         medicalRecordsRepository.save(medicalRecord);
@@ -24,14 +28,14 @@ public class MedicalRecordService {
         return medicalRecordDTO;
     }
 
-    public MedicalRecordDTO update (MedicalRecordDTO medicalRecordDTO, UUID medicalRecordId){
+    public MedicalRecordDTO update(MedicalRecordDTO medicalRecordDTO, UUID medicalRecordId) {
         MedicalRecord medicalRecordInDb = medicalRecordsRepository.getReferenceById(medicalRecordId);
         medicalRecordInDb.setAnimal_id(medicalRecordDTO.getAnimal_id());
         medicalRecordsRepository.save(medicalRecordInDb);
         return medicalRecordDTO;
     }
 
-    public List<MedicalRecordDTO> getAllMedicalRecords () {
+    public List<MedicalRecordDTO> getAllMedicalRecords() {
         return medicalRecordsRepository
                 .findAll()
                 .stream()
@@ -44,7 +48,7 @@ public class MedicalRecordService {
                 .map(this::converter);
     }
 
-    public String delete (UUID medicalRecordId) {
+    public String delete(UUID medicalRecordId) {
         Optional<MedicalRecord> medicalRecordInDb = medicalRecordsRepository.findById(medicalRecordId);
         if (medicalRecordInDb.isEmpty()) {
             return "Animal not found";
@@ -54,7 +58,7 @@ public class MedicalRecordService {
         }
     }
 
-    private MedicalRecordDTO converter (MedicalRecord medicalRecord) {
+    private MedicalRecordDTO converter(MedicalRecord medicalRecord) {
         MedicalRecordDTO result = new MedicalRecordDTO();
         result.setId(medicalRecord.getId());
         result.setAnimal_id(medicalRecord.getAnimal_id());

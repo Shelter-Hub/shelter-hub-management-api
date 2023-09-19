@@ -8,6 +8,8 @@ import com.shelterhub.exception.InvalidValueException;
 import com.shelterhub.exception.PersistenceFailedException;
 import com.shelterhub.exception.ResourceNotFoundException;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ public class AnimalService {
 
     @Autowired
     private AnimalRepository animalRepository;
+
+    private static Logger log = LoggerFactory.getLogger(AnimalService.class);
 
     public AnimalResponseDTO create(AnimalDTO animalDTO) {
         if (ObjectUtils.isEmpty(animalDTO.getAnimalType())) {
@@ -49,7 +53,7 @@ public class AnimalService {
         List<AnimalResponseDTO> animals = new ArrayList<>();
         var animalEntities = animalRepository.findAll();
 
-        animalEntities.forEach( animal ->
+        animalEntities.forEach(animal ->
                 animals.add(animal.toResponse())
         );
 
