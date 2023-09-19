@@ -62,8 +62,6 @@ public class AnimalServiceTest {
                 () -> animalService.create(animalDTO)
         );
 
-        animalService.create(animalDTO);
-
         verify(animalRepository, times(0)).save(any(Animal.class));
     }
 
