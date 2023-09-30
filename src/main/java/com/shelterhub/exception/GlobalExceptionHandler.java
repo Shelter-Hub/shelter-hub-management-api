@@ -10,12 +10,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidFormatException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidFormatException(InvalidFormatException ex) {
+    public ResponseEntity<ErrorResponse> handleInvalidFormatException(
+            InvalidFormatException ex
+    ) {
         ErrorResponse errorResponse = new ErrorResponse(
                 "Invalid request parameter: " +
-                ex.getPath().get(0).getFieldName()
+                        ex.getPath().get(0).getFieldName()
         );
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity
+                .badRequest()
+                .body(errorResponse);
     }
 
     @ExceptionHandler(InvalidValueException.class)
@@ -24,7 +28,9 @@ public class GlobalExceptionHandler {
                 "Invalid value provided for the enum: " +
                         ex.getLocalizedMessage()
         );
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity
+                .badRequest()
+                .body(errorResponse);
     }
 
 
@@ -34,21 +40,40 @@ public class GlobalExceptionHandler {
                 "Error while trying to persist a new animal: " +
                         ex.getLocalizedMessage()
         );
-        return ResponseEntity.internalServerError().body(errorResponse);
+        return ResponseEntity
+                .internalServerError()
+                .body(errorResponse);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+            ConstraintViolationException ex
+    ) {
         ErrorResponse errorResponse = new ErrorResponse(
                 "Some constraint in the request was not properly validated: " +
                         ex.getLocalizedMessage()
         );
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity
+                .badRequest()
+                .body(errorResponse);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException() {
-        return ResponseEntity.notFound().build();
+        return ResponseEntity
+                .notFound()
+                .build();
     }
 
+    @ExceptionHandler(NotUpdatableException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+            NotUpdatableException ex
+    ) {
+        ErrorResponse errorResponse =
+                new ErrorResponse(ex.getLocalizedMessage());
+
+        return ResponseEntity
+                .badRequest()
+                .body(errorResponse);
+    }
 }

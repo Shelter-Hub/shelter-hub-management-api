@@ -1,53 +1,45 @@
-package com.shelterhub.domain.model;
+package com.shelterhub.dto.request;
 
 import com.shelterhub.domain.enums.AnimalType;
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
-import com.shelterhub.dto.response.AnimalResponse;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import com.shelterhub.domain.model.Animal;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.EnumUtils;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
-@Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@Table
-public class Animal {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class AnimalRequest {
     private UUID id;
-    @Column(nullable = false)
     private String name;
     private String identification;
     private String behavior;
     private String breed;
     private String history;
-    private LocalDate estimatedAge;
+    private EstimatedAgeRequest estimatedAge;
     private UUID medicalRecordId;
-    private AnimalType animalType;
+    private String animalType;
     private Gender gender;
     private Size size;
 
-    public AnimalResponse toResponse() {
-        return AnimalResponse.builder()
+    public Animal toAnimal() {
+        return Animal.builder()
                 .id(getId())
                 .name(getName())
                 .identification(getIdentification())
+                .estimatedAge(estimatedAge.toEstimatedAge())
+                .medicalRecordId(getMedicalRecordId())
+                .animalType(EnumUtils.getEnum(AnimalType.class, getAnimalType(), AnimalType.Unknown))
                 .behavior(getBehavior())
                 .breed(getBreed())
                 .history(getHistory())
-                .estimatedAge(getEstimatedAge())
-                .medicalRecordId(getMedicalRecordId())
-                .animalType(String.valueOf(getAnimalType()))
                 .gender(getGender())
                 .size(getSize())
                 .build();
     }
 }
+
+
