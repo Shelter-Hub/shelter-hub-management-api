@@ -2,30 +2,24 @@ package com.shelterhub.service;
 
 import com.shelterhub.database.AnimalRepository;
 import com.shelterhub.domain.model.Animal;
-import com.shelterhub.dto.AnimalDTO;
-import com.shelterhub.dto.AnimalResponseDTO;
+import com.shelterhub.dto.request.AnimalRequest;
+import com.shelterhub.dto.response.AnimalResponse;
 import com.shelterhub.exception.InvalidValueException;
 import com.shelterhub.exception.PersistenceFailedException;
 import com.shelterhub.exception.ResourceNotFoundException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static com.shelterhub.utils.AnimalUtils.buildAnimalDTO;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static com.shelterhub.utils.AnimalTestUtils.buildAnimalDTO;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class AnimalServiceTest {
     @Mock
@@ -42,24 +36,24 @@ public class AnimalServiceTest {
 
     @Test
     public void shouldReturnCreatedAnimalDTO() {
-        AnimalDTO animalDTO = buildAnimalDTO(false);
+        AnimalRequest animalRequest = buildAnimalDTO(true);
 
-        when(animalRepository.save(any(Animal.class))).thenReturn(animalDTO.toAnimal());
+        when(animalRepository.save(any(Animal.class))).thenReturn(animalRequest.toAnimal());
 
-        AnimalResponseDTO result = animalService.create(animalDTO);
+        AnimalResponse result = animalService.create(animalRequest);
 
-        assertAnimalDTO(animalDTO, result);
+        assertAnimalDTO(animalRequest, result);
         verify(animalRepository, times(1)).save(any(Animal.class));
     }
 
 
     @Test
     public void shouldThrowsInvalidValueExceptionWhenAnimalTypeIsNullOrEmpty() {
-        AnimalDTO animalDTO = buildAnimalDTO(false, "");
+        AnimalRequest animalRequest = buildAnimalDTO(false, "");
 
         assertThrowsExactly(
                 InvalidValueException.class,
-                () -> animalService.create(animalDTO)
+                () -> animalService.create(animalRequest)
         );
 
         verify(animalRepository, times(0)).save(any(Animal.class));
@@ -67,13 +61,13 @@ public class AnimalServiceTest {
 
     @Test
     public void shouldThrowPersistenceFailedExceptionWhenCreatingAnimal() {
-        AnimalDTO animalDTO = buildAnimalDTO(false);
+        AnimalRequest animalRequest = buildAnimalDTO(false);
 
         when(animalRepository.save(any(Animal.class))).thenThrow(RuntimeException.class);
 
         assertThrows(
                 PersistenceFailedException.class,
-                () -> animalService.create(animalDTO)
+                () -> animalService.create(animalRequest)
         );
 
         verify(animalRepository, times(1)).save(any(Animal.class));
@@ -81,34 +75,34 @@ public class AnimalServiceTest {
 
     @Test
     public void shouldReturnUpdatedAnimalDTO() {
-        AnimalDTO substitutedAnimalDTO = buildAnimalDTO(true);
-        AnimalDTO animalDTO = buildAnimalDTO(true);
+        AnimalRequest substitutedAnimalRequest = buildAnimalDTO(true);
+        AnimalRequest animalRequest = buildAnimalDTO(true);
 
-        when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.of(substitutedAnimalDTO.toAnimal()));
-        when(animalRepository.save(any(Animal.class))).thenReturn(animalDTO.toAnimal());
+        when(animalRepository.existsById(animalRequest.getId())).thenReturn(true);
+        when(animalRepository.save(any(Animal.class))).thenReturn(animalRequest.toAnimal());
 
-        AnimalResponseDTO result = animalService.updateById(animalDTO, animalDTO.getId());
+        AnimalResponse result = animalService.updateById(animalRequest, animalRequest.getId());
 
-        assertEquals(animalDTO.getId(), result.getId());
-        assertAnimalDTO(animalDTO, result);
+        assertEquals(animalRequest.getId(), result.getId());
+        assertAnimalDTO(animalRequest, result);
         verify(animalRepository, times(1)).save(any(Animal.class));
-        verify(animalRepository, times(1)).findById(animalDTO.getId());
+        verify(animalRepository, times(1)).existsById(animalRequest.getId());
     }
 
     @Test
     public void shouldNotReturnUpdatedAnimalDTOIfAnimalNotFound() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
+        AnimalRequest animalRequest = buildAnimalDTO(true);
 
-        when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.empty());
+        when(animalRepository.existsById(animalRequest.getId())).thenReturn(false);
 
         assertThrows(
                 ResourceNotFoundException.class,
                 () -> animalService.updateById(
-                        animalDTO,
-                        animalDTO.getId()
+                        animalRequest,
+                        animalRequest.getId()
                 )
         );
-        verify(animalRepository, times(1)).findById(animalDTO.getId());
+        verify(animalRepository, times(1)).existsById(animalRequest.getId());
     }
 
     @Test
@@ -119,7 +113,7 @@ public class AnimalServiceTest {
 
         when(animalRepository.findAll()).thenReturn(animals);
 
-        List<AnimalResponseDTO> result = animalService.getAllAnimals();
+        List<AnimalResponse> result = animalService.getAll();
 
         assertEquals(animals.size(), result.size());
         verify(animalRepository, times(1)).findAll();
@@ -127,59 +121,59 @@ public class AnimalServiceTest {
 
     @Test
     public void shouldReturnAnimalById() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
+        AnimalRequest animalRequest = buildAnimalDTO(true);
 
-        when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.of(animalDTO.toAnimal()));
+        when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.of(animalRequest.toAnimal()));
 
-        AnimalResponseDTO result = animalService.getAnimalById(animalDTO.getId());
+        AnimalResponse result = animalService.getAnimalById(animalRequest.getId());
 
-        assertEquals(animalDTO.getId(), result.getId());
-        assertAnimalDTO(animalDTO, result);
-        verify(animalRepository, times(1)).findById(animalDTO.getId());
+        assertEquals(animalRequest.getId(), result.getId());
+        assertAnimalDTO(animalRequest, result);
+        verify(animalRepository, times(1)).findById(animalRequest.getId());
     }
 
     @Test
     public void shouldNotReturnAnimalByIdIfAnimalNotFound() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
+        AnimalRequest animalRequest = buildAnimalDTO(true);
 
-        when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.empty());
+        when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> animalService.delete(animalDTO.getId()));
-        verify(animalRepository, times(1)).findById(animalDTO.getId());
+        assertThrows(ResourceNotFoundException.class, () -> animalService.delete(animalRequest.getId()));
+        verify(animalRepository, times(1)).findById(animalRequest.getId());
     }
 
     @Test
     public void shouldDeleteAnimal() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
+        AnimalRequest animalRequest = buildAnimalDTO(true);
 
-        when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.of(animalDTO.toAnimal()));
+        when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.of(animalRequest.toAnimal()));
 
-        AnimalResponseDTO result = animalService.delete(animalDTO.getId());
+        AnimalResponse result = animalService.delete(animalRequest.getId());
 
-        verify(animalRepository, times(1)).deleteById(animalDTO.getId());
-        verify(animalRepository, times(1)).findById(animalDTO.getId());
+        verify(animalRepository, times(1)).deleteById(animalRequest.getId());
+        verify(animalRepository, times(1)).findById(animalRequest.getId());
         assertNotNull(result);
-        assertEquals(animalDTO.getId(), result.getId());
+        assertEquals(animalRequest.getId(), result.getId());
     }
 
     @Test
     public void shouldNotDeleteAnimalIfAnimalNotFound() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
+        AnimalRequest animalRequest = buildAnimalDTO(true);
 
-        when(animalRepository.findById(animalDTO.getId())).thenReturn(Optional.empty());
+        when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> animalService.delete(animalDTO.getId()));
+        assertThrows(ResourceNotFoundException.class, () -> animalService.delete(animalRequest.getId()));
 
-        verify(animalRepository, times(0)).deleteById(animalDTO.getId());
-        verify(animalRepository, times(1)).findById(animalDTO.getId());
+        verify(animalRepository, times(0)).deleteById(animalRequest.getId());
+        verify(animalRepository, times(1)).findById(animalRequest.getId());
     }
 
-    private static void assertAnimalDTO(AnimalDTO animalDTO, AnimalResponseDTO result) {
+    private static void assertAnimalDTO(AnimalRequest animalRequest, AnimalResponse result) {
         assertAll(
-                () -> assertEquals(animalDTO.getName(), result.getName()),
-                () -> assertEquals(animalDTO.getEstimatedAgeDTO().toEstimatedAge(), result.getEstimatedAge()),
-                () -> assertEquals(animalDTO.getAnimalType(), result.getAnimalType()),
-                () -> assertEquals(animalDTO.getMedicalRecordId(), result.getMedicalRecordId())
+                () -> assertEquals(animalRequest.getName(), result.getName()),
+                () -> assertEquals(animalRequest.getEstimatedAge().toEstimatedAge(), result.getEstimatedAge()),
+                () -> assertEquals(animalRequest.getAnimalType(), result.getAnimalType()),
+                () -> assertEquals(animalRequest.getMedicalRecordId(), result.getMedicalRecordId())
         );
     }
 }

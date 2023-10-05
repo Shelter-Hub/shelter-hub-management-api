@@ -16,3 +16,10 @@ spring:
   jpa:
     show-sql: true
     generate-ddl: true
+
+logging:
+  pattern:
+    console: "%cyan(%d{HH:mm:ss.SSS}) %blue([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n"
+  level:
+    root: INFO
+    org.springframework.web: INFO

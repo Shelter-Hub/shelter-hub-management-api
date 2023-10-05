@@ -1,7 +1,7 @@
 package com.shelterhub.controller;
 
-import com.shelterhub.dto.AnimalDTO;
-import com.shelterhub.dto.AnimalResponseDTO;
+import com.shelterhub.dto.request.AnimalRequest;
+import com.shelterhub.dto.response.AnimalResponse;
 import com.shelterhub.service.AnimalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -21,46 +22,54 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/animal", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "v1/animal", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AnimalController {
 
     @Autowired
     private AnimalService animalService;
 
     @GetMapping("/{id}")
-    public AnimalResponseDTO getAnimalById(@PathVariable UUID id) {
+    @ResponseBody
+    public AnimalResponse getById(@PathVariable UUID id) {
         return animalService.getAnimalById(id);
     }
 
     @GetMapping
-    public List<AnimalResponseDTO> getAllAnimals() {
-        return animalService.getAllAnimals();
+    public ResponseEntity<List<AnimalResponse>> getAll() {
+        var animals = animalService.getAll();
+
+        if (animals.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(animals);
     }
 
     @PostMapping
-    public ResponseEntity<AnimalResponseDTO> createAnimal(@RequestBody AnimalDTO animal) {
-            AnimalResponseDTO createdAnimal = animalService.create(animal);
+    public ResponseEntity<AnimalResponse> create(
+            @RequestBody AnimalRequest animalRequest
+    ) {
+        AnimalResponse animal = animalService.create(animalRequest);
 
-            var id = createdAnimal.getId().toString();
-            var location = URI.create(id);
+        var id = animal.getId().toString();
+        var location = URI.create(id);
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .location(location)
-                    .body(createdAnimal);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .location(location)
+                .body(animal);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateAnimal(
             @PathVariable UUID id,
-            @RequestBody AnimalDTO animal
+            @RequestBody AnimalRequest animal
     ) {
         animalService.updateById(animal, id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAnimal(@PathVariable UUID id){
+    public ResponseEntity<Void> deleteAnimal(@PathVariable UUID id) {
         animalService.delete(id);
 
         return ResponseEntity.noContent().build();

@@ -1,12 +1,14 @@
 package com.shelterhub.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javafaker.Faker;
-import com.shelterhub.dto.AnimalDTO;
-import com.shelterhub.dto.AnimalResponseDTO;
+import com.shelterhub.domain.enums.Gender;
+import com.shelterhub.domain.enums.Size;
+import com.shelterhub.dto.request.AnimalRequest;
+import com.shelterhub.dto.response.AnimalResponse;
 import com.shelterhub.exception.ResourceNotFoundException;
 import com.shelterhub.service.AnimalService;
 import lombok.SneakyThrows;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,11 +20,16 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.List;
 import java.util.UUID;
 
-import static com.shelterhub.utils.AnimalUtils.buildAnimalDTO;
+import static com.shelterhub.utils.AnimalTestUtils.buildAnimalDTO;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AnimalController.class)
 public class AnimalControllerTest {
@@ -32,26 +39,35 @@ public class AnimalControllerTest {
     @MockBean
     private AnimalService animalService;
 
+    private final String PATH_URL = "/v1/animal";
+
     @Test
     @SneakyThrows
     public void shouldReturnAnimalById() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
-        UUID animalId = animalDTO.getId();
-        AnimalResponseDTO animalResponse = animalDTO.toAnimal().toResponse();
+        AnimalRequest animalRequest = buildAnimalDTO(true);
+        UUID animalId = animalRequest.getId();
+
+        AnimalResponse animalResponse = animalRequest
+                .toAnimal()
+                .toResponse();
 
         when(animalService.getAnimalById(animalId)).thenReturn(animalResponse);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/animal/{id}", animalId))
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL + "/{id}", animalId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(animalId.toString()))
-                .andExpect(jsonPath("$.animalType").value(animalDTO.getAnimalType()))
-                .andExpect(jsonPath("$.name").value(animalDTO.getName()))
-                .andExpect(jsonPath("$.estimatedAge").value(animalDTO
-                        .getEstimatedAgeDTO()
-                        .toEstimatedAge()
-                        .toString())
-                );
+                .andExpect(jsonPath("$.name").value(animalRequest.getName()))
+                .andExpect(jsonPath("$.identification").value(animalRequest.getIdentification()))
+                .andExpect(jsonPath("$.behavior").value(animalRequest.getBehavior()))
+                .andExpect(jsonPath("$.breed").value(animalRequest.getBreed()))
+                .andExpect(jsonPath("$.history").value(animalRequest.getHistory()))
+                .andExpect(jsonPath("$.estimatedAge").value(animalRequest.getEstimatedAge().toEstimatedAge()
+                        .toString()))
+                .andExpect(jsonPath("$.medicalRecordId").value(animalRequest.getMedicalRecordId().toString()))
+                .andExpect(jsonPath("$.animalType").value(animalRequest.getAnimalType()))
+                .andExpect(jsonPath("$.gender").value(Gender.FEMALE.toString()))
+                .andExpect(jsonPath("$.size").value(Size.SMALL.toString()));
+
 
         verify(animalService, times(1)).getAnimalById(animalId);
         verifyNoMoreInteractions(animalService);
@@ -63,7 +79,7 @@ public class AnimalControllerTest {
         var animalId = UUID.randomUUID();
         when(animalService.getAnimalById(animalId)).thenThrow(ResourceNotFoundException.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/animal/{id}", animalId))
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL + "/{id}", animalId))
                 .andExpect(status().isNotFound());
 
         verify(animalService, times(1)).getAnimalById(animalId);
@@ -74,7 +90,7 @@ public class AnimalControllerTest {
     @SneakyThrows
     public void shouldNotGetAnimalByIdIfUUIDIsNull() {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/animal/{id}", "42d7caba-4869-42b2-af86-f340dd461882888"))
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL + "/{id}", "42d7caba-4869-42b2-af86-f340dd461882888"))
                 .andExpect(status().isBadRequest());
 
     }
@@ -82,12 +98,12 @@ public class AnimalControllerTest {
     @Test
     @SneakyThrows
     public void shouldReturnAllAnimals() {
-        AnimalResponseDTO firstAnimal = buildAnimalDTO(true).toAnimal().toResponse();
-        AnimalResponseDTO secondAnimal = buildAnimalDTO(true).toAnimal().toResponse();
+        AnimalResponse firstAnimal = buildAnimalDTO(true).toAnimal().toResponse();
+        AnimalResponse secondAnimal = buildAnimalDTO(true).toAnimal().toResponse();
 
-        when(animalService.getAllAnimals()).thenReturn(List.of(firstAnimal, secondAnimal));
+        when(animalService.getAll()).thenReturn(List.of(firstAnimal, secondAnimal));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/animal"))
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -100,58 +116,58 @@ public class AnimalControllerTest {
                 .andExpect(jsonPath("$[1].name").value(secondAnimal.getName()))
                 .andExpect(jsonPath("$[1].estimatedAge").value(secondAnimal.getEstimatedAge().toString()));
 
-        verify(animalService, times(1)).getAllAnimals();
+        verify(animalService, times(1)).getAll();
         verifyNoMoreInteractions(animalService);
     }
 
     @Test
     @SneakyThrows
-    public void shouldReturnZeroAnimalsWhenRepositoryIsEmpty() {
-        when(animalService.getAllAnimals()).thenReturn(List.of());
+    public void shouldReturnNotFoundResponseWhenRepositoryIsEmpty() {
+        when(animalService.getAll()).thenReturn(List.of());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/animal"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").doesNotExist());
 
-        verify(animalService, times(1)).getAllAnimals();
+
+        verify(animalService, times(1)).getAll();
         verifyNoMoreInteractions(animalService);
     }
 
     @Test
     @SneakyThrows
     public void shouldCreateAnimal() {
-        AnimalDTO animalDTO = buildAnimalDTO(false);
-        AnimalResponseDTO animalResponseDTO = animalDTO.toAnimal().toResponse();
-        animalResponseDTO.setId(UUID.randomUUID());
-        when(animalService.create(animalDTO)).thenReturn(animalResponseDTO);
+        AnimalRequest animalRequest = buildAnimalDTO(false);
+        AnimalResponse animalResponse = animalRequest.toAnimal().toResponse();
+        animalResponse.setId(UUID.randomUUID());
+        when(animalService.create(animalRequest)).thenReturn(animalResponse);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/animal")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(animalDTO)))
+        mockMvc.perform(MockMvcRequestBuilders.post(PATH_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(animalRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(animalResponseDTO.getId().toString()))
-                .andExpect(jsonPath("$.animalType").value(animalDTO.getAnimalType()))
-                .andExpect(jsonPath("$.name").value(animalDTO.getName()))
-                .andExpect(jsonPath("$.estimatedAge").value(animalDTO.getEstimatedAgeDTO().toEstimatedAge().toString()));
+                .andExpect(jsonPath("$.id").value(animalResponse.getId().toString()))
+                .andExpect(jsonPath("$.animalType").value(animalRequest.getAnimalType()))
+                .andExpect(jsonPath("$.name").value(animalRequest.getName()))
+                .andExpect(jsonPath("$.estimatedAge").value(animalRequest.getEstimatedAge().toEstimatedAge().toString()));
 
-        verify(animalService, times(1)).create(animalDTO);
+        verify(animalService, times(1)).create(animalRequest);
         verifyNoMoreInteractions(animalService);
     }
 
     @Test
     @SneakyThrows
     public void shouldNotCreateAnimalWithInvalidSize() {
-        AnimalDTO animalDTO = buildAnimalDTO(false);
+        AnimalRequest animalRequest = buildAnimalDTO(false);
 
         String invalidSize = new Faker().lorem().characters(10);
 
         String invalidJsonPayload = new ObjectMapper()
-                .writeValueAsString(animalDTO)
-                .replace("\"size\":\"" + animalDTO.getSize() + "\"", "\"size\":\"" + invalidSize + "\"");
+                .writeValueAsString(animalRequest)
+                .replace("\"size\":\"" + animalRequest.getSize() + "\"", "\"size\":\"" + invalidSize + "\"");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/animal")
+        mockMvc.perform(MockMvcRequestBuilders.post(PATH_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJsonPayload))
                 .andExpect(status().isBadRequest())
@@ -162,17 +178,17 @@ public class AnimalControllerTest {
     @Test
     @SneakyThrows
     public void shouldNotCreateAnimalWithInvalidGender() {
-        AnimalDTO animalDTO = buildAnimalDTO(false);
+        AnimalRequest animalRequest = buildAnimalDTO(false);
 
         String invalidGender = new Faker().lorem().characters(10);
 
         String invalidJsonPayload = new ObjectMapper()
-                .writeValueAsString(animalDTO)
-                .replace("\"gender\":\"" + animalDTO.getGender() + "\"",
+                .writeValueAsString(animalRequest)
+                .replace("\"gender\":\"" + animalRequest.getGender() + "\"",
                         "\"gender\":\"" + invalidGender + "\""
                 );
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/animal")
+        mockMvc.perform(MockMvcRequestBuilders.post(PATH_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJsonPayload))
                 .andExpect(status().isBadRequest())
@@ -183,46 +199,46 @@ public class AnimalControllerTest {
     @Test
     @SneakyThrows
     public void shouldUpdateAnimal() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
-        UUID animalId = animalDTO.getId();
+        AnimalRequest animalRequest = buildAnimalDTO(true);
+        UUID animalId = animalRequest.getId();
 
-        when(animalService.updateById(animalDTO, animalId)).thenReturn(animalDTO.toAnimal().toResponse());
+        when(animalService.updateById(animalRequest, animalId)).thenReturn(animalRequest.toAnimal().toResponse());
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/animal/{id}", animalId)
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_URL + "/{id}", animalId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(animalDTO)))
+                        .content(new ObjectMapper().writeValueAsString(animalRequest)))
                 .andExpect(status().isNoContent());
 
-        verify(animalService, times(1)).updateById(animalDTO, animalId);
+        verify(animalService, times(1)).updateById(animalRequest, animalId);
         verifyNoMoreInteractions(animalService);
     }
 
     @Test
     @SneakyThrows
     public void shouldNotUpdateAnimalIfAnimalNotFound() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
-        UUID animalId = animalDTO.getId();
+        AnimalRequest animalRequest = buildAnimalDTO(true);
+        UUID animalId = animalRequest.getId();
 
-        when(animalService.updateById(animalDTO, animalId)).thenThrow(ResourceNotFoundException.class);
+        when(animalService.updateById(animalRequest, animalId)).thenThrow(ResourceNotFoundException.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/animal/{id}", animalId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(animalDTO))
-                ).andExpect(status().isNotFound());
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_URL + "/{id}", animalId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(animalRequest))
+        ).andExpect(status().isNotFound());
 
-        verify(animalService, times(1)).updateById(animalDTO, animalId);
+        verify(animalService, times(1)).updateById(animalRequest, animalId);
         verifyNoMoreInteractions(animalService);
     }
 
     @Test
     @SneakyThrows
     public void shouldDeleteAnimal() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
-        UUID animalId = animalDTO.getId();
-        var animalResponse = animalDTO.toAnimal().toResponse();
+        AnimalRequest animalRequest = buildAnimalDTO(true);
+        UUID animalId = animalRequest.getId();
+        var animalResponse = animalRequest.toAnimal().toResponse();
         when(animalService.delete(animalId)).thenReturn(animalResponse);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/animal/{id}", animalId))
+        mockMvc.perform(MockMvcRequestBuilders.delete(PATH_URL + "/{id}", animalId))
                 .andExpect(status().isNoContent());
 
         verify(animalService, times(1)).delete(animalId);
@@ -232,12 +248,12 @@ public class AnimalControllerTest {
     @Test
     @SneakyThrows
     public void shouldNotDeleteAnimalIfAnimalNotFound() {
-        AnimalDTO animalDTO = buildAnimalDTO(true);
-        UUID animalId = animalDTO.getId();
+        AnimalRequest animalRequest = buildAnimalDTO(true);
+        UUID animalId = animalRequest.getId();
 
         when(animalService.delete(animalId)).thenThrow(ResourceNotFoundException.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/animal/{id}", animalId))
+        mockMvc.perform(MockMvcRequestBuilders.delete(PATH_URL + "/{id}", animalId))
                 .andExpect(status().isNotFound());
 
         verify(animalService, times(1)).delete(animalId);

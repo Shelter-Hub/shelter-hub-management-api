@@ -2,63 +2,92 @@ package com.shelterhub.service;
 
 import com.shelterhub.database.MedicalRecordsRepository;
 import com.shelterhub.domain.model.MedicalRecord;
-import com.shelterhub.dto.MedicalRecordDTO;
+import com.shelterhub.dto.request.MedicalRecordRequest;
+import com.shelterhub.dto.response.MedicalRecordResponse;
+import com.shelterhub.exception.PersistenceFailedException;
+import com.shelterhub.exception.UnknownErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class MedicalRecordService {
     @Autowired
     private MedicalRecordsRepository medicalRecordsRepository;
 
-    public MedicalRecordDTO create (MedicalRecordDTO medicalRecordDTO){
-        MedicalRecord medicalRecord = new MedicalRecord();
-        medicalRecord.setAnimal_id(medicalRecordDTO.getAnimal_id());
-        medicalRecordsRepository.save(medicalRecord);
-        medicalRecordDTO.setId(medicalRecord.getId());
-        return medicalRecordDTO;
-    }
+    private static final Logger log = LoggerFactory.getLogger(MedicalRecordService.class);
 
-    public MedicalRecordDTO update (MedicalRecordDTO medicalRecordDTO, UUID medicalRecordId){
-        MedicalRecord medicalRecordInDb = medicalRecordsRepository.getReferenceById(medicalRecordId);
-        medicalRecordInDb.setAnimal_id(medicalRecordDTO.getAnimal_id());
-        medicalRecordsRepository.save(medicalRecordInDb);
-        return medicalRecordDTO;
-    }
+    public MedicalRecordResponse create(MedicalRecordRequest medicalRecordRequest) {
+        try {
+            MedicalRecord medicalRecord = medicalRecordsRepository.save(medicalRecordRequest.toMedicalRecord());
 
-    public List<MedicalRecordDTO> getAllMedicalRecords () {
-        return medicalRecordsRepository
-                .findAll()
-                .stream()
-                .map(this::converter).collect(Collectors.toList());
-    }
+            log.makeLoggingEventBuilder(Level.INFO)
+                    .setMessage("Medical record was saved with success.")
+                    .addKeyValue("medicalRecordId", medicalRecord.getId().toString())
+                    .log();
 
-    public Optional<MedicalRecordDTO> getMedicalRecordById(UUID medicalRecordId) {
-        return medicalRecordsRepository
-                .findById(medicalRecordId)
-                .map(this::converter);
-    }
-
-    public String delete (UUID medicalRecordId) {
-        Optional<MedicalRecord> medicalRecordInDb = medicalRecordsRepository.findById(medicalRecordId);
-        if (medicalRecordInDb.isEmpty()) {
-            return "Animal not found";
-        } else {
-            medicalRecordsRepository.deleteById(medicalRecordId);
-            return "Animal " + medicalRecordId + "was deleted successfully";
+            return medicalRecord.toResponse();
+        } catch (DataAccessException ex) {
+            throw new PersistenceFailedException(ex.getLocalizedMessage());
+        } catch (Exception ex) {
+            throw new UnknownErrorException(ex.getLocalizedMessage());
         }
     }
 
-    private MedicalRecordDTO converter (MedicalRecord medicalRecord) {
-        MedicalRecordDTO result = new MedicalRecordDTO();
-        result.setId(medicalRecord.getId());
-        result.setAnimal_id(medicalRecord.getAnimal_id());
-        return result;
+    public MedicalRecordResponse update(MedicalRecordRequest medicalRecordRequest, UUID uuid) {
+        try {
+            MedicalRecord medicalRecord = medicalRecordRequest.toMedicalRecord();
+
+            var medicalRecordResult = medicalRecordsRepository.save(medicalRecord.copy(uuid));
+
+            log.makeLoggingEventBuilder(Level.INFO)
+                    .setMessage("Medical record was updated with success.")
+                    .addKeyValue("medicalRecordId", medicalRecord.getId().toString())
+                    .log();
+
+            return medicalRecordResult.toResponse();
+
+        } catch (DataAccessException ex) {
+            throw new PersistenceFailedException(ex.getLocalizedMessage());
+        } catch (Exception ex) {
+            throw new UnknownErrorException(ex.getLocalizedMessage());
+        }
     }
 
+    public List<MedicalRecordResponse> getAll() {
+        return medicalRecordsRepository
+                .findAll()
+                .stream()
+                .map(MedicalRecord::toResponse)
+                .toList();
+    }
+
+    public Optional<MedicalRecordResponse> getById(UUID medicalRecordId) {
+        return medicalRecordsRepository
+                .findById(medicalRecordId)
+                .map(MedicalRecord::toResponse);
+    }
+
+    public Optional<MedicalRecord> deleteById(UUID id) {
+        Optional<MedicalRecord> medicalRecordOptional = medicalRecordsRepository.findById(id);
+        if (medicalRecordOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        medicalRecordsRepository.deleteById(id);
+
+        log.makeLoggingEventBuilder(Level.INFO)
+                .setMessage("Medical record was deleted with success.")
+                .addKeyValue("medicalRecordId", id)
+                .log();
+
+        return medicalRecordOptional;
+    }
 }

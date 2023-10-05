@@ -1,4 +1,4 @@
-package com.shelterhub.dto;
+package com.shelterhub.dto.response;
 
 import com.shelterhub.domain.enums.Gender;
 import com.shelterhub.domain.enums.Size;
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class AnimalResponseDTO {
+public class AnimalResponse {
     private UUID id;
     private String name;
     private String identification;
