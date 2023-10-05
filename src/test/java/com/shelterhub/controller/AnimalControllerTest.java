@@ -23,8 +23,13 @@ import java.util.UUID;
 import static com.shelterhub.utils.AnimalTestUtils.buildAnimalDTO;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AnimalController.class)
 public class AnimalControllerTest {
@@ -41,7 +46,10 @@ public class AnimalControllerTest {
     public void shouldReturnAnimalById() {
         AnimalRequest animalRequest = buildAnimalDTO(true);
         UUID animalId = animalRequest.getId();
-        AnimalResponse animalResponse = animalRequest.toAnimal().toResponse();
+
+        AnimalResponse animalResponse = animalRequest
+                .toAnimal()
+                .toResponse();
 
         when(animalService.getAnimalById(animalId)).thenReturn(animalResponse);
 

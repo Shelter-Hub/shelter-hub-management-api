@@ -76,4 +76,17 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(errorResponse);
     }
+
+    @ExceptionHandler(UnknownErrorException.class)
+    public ResponseEntity<ErrorResponse> handleInternalServerError(
+            UnknownErrorException ex
+    ) {
+        var errorResponse = new ErrorResponse("Some unknown problem happened: " +
+                ex.getLocalizedMessage()
+        );
+
+        return ResponseEntity
+                .internalServerError()
+                .body(errorResponse);
+    }
 }
