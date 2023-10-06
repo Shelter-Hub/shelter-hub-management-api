@@ -9,8 +9,11 @@ import br.com.shelterhubmanagementapi.exception.PersistenceFailedException
 import br.com.shelterhubmanagementapi.exception.ResourceNotFoundException
 import br.com.shelterhubmanagementapi.exception.UnknownErrorException
 import br.com.shelterhubmanagementapi.repository.MedicalRecordRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import org.springframework.dao.DataAccessException
@@ -57,10 +60,11 @@ class MedicalRecordService(
         }
     }
 
-    suspend fun getAll(): Flow<MedicalRecordResponse> =
+    suspend fun getAll(): List<MedicalRecordResponse> =
         medicalRecordRepository
             .findAll()
             .mapNotNull { it.toResponse() }
+            .toList()
 
     suspend fun getById(medicalRecordId: UUID): MedicalRecordResponse {
         val medicalRecord =
@@ -69,16 +73,14 @@ class MedicalRecordService(
         return medicalRecord?.toResponse() ?: throw ResourceNotFoundException()
     }
 
-    suspend fun deleteById(id: UUID): MedicalRecord? {
-        val medicalRecord = medicalRecordRepository.findById(id)
-
-        medicalRecordRepository.deleteById(id)
-
-        log.makeLoggingEventBuilder(Level.INFO)
-            .setMessage("Medical record was deleted with success.")
-            .addKeyValue("medicalRecordId", id)
-            .log()
-
-        return medicalRecord
-    }
+    suspend fun deleteById(id: UUID) =
+        coroutineScope {
+            launch(Dispatchers.IO) {
+                medicalRecordRepository.deleteById(id)
+                log.makeLoggingEventBuilder(Level.INFO)
+                    .setMessage("Medical record was deleted with success.")
+                    .addKeyValue("medicalRecordId", id)
+                    .log()
+            }
+        }
 }

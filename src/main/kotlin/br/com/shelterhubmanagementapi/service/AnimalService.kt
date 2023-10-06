@@ -21,7 +21,10 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class AnimalService(private val animalRepository: AnimalRepository) {
+class AnimalService(
+    private val animalRepository: AnimalRepository,
+    private val medicalRecordService: MedicalRecordService,
+) {
     private val log = LoggerFactory.getLogger(AnimalService::class.java)
 
     suspend fun create(animalRequest: AnimalRequest): AnimalResponse {
@@ -43,13 +46,19 @@ class AnimalService(private val animalRepository: AnimalRepository) {
     suspend fun updateById(
         animalRequest: AnimalRequest,
         animalId: UUID,
-    ): AnimalResponse {
-        val exists = animalRepository.existsById(animalId)
-        if (!exists) throw ResourceNotFoundException()
-        val animal: Animal = animalRequest.toAnimal()
-        val updatedAnimal = animalRepository.save(animal)
-        return updatedAnimal.toResponse()
-    }
+    ): Pair<Deferred<Boolean>, Deferred<AnimalResponse>> =
+        coroutineScope {
+            val animalExistsBefore =
+                async(Dispatchers.IO) {
+                    animalRepository.existsById(animalId)
+                }
+            val savedAnimal =
+                async(Dispatchers.IO) {
+                    val animal: Animal = animalRequest.toAnimal()
+                    animalRepository.save(animal).toResponse()
+                }
+            return@coroutineScope Pair(animalExistsBefore, savedAnimal)
+        }
 
     suspend fun getAll(): Deferred<List<AnimalResponse>> =
         coroutineScope {
@@ -73,9 +82,10 @@ class AnimalService(private val animalRepository: AnimalRepository) {
         val animal = animalRepository.findById(animalId)
         animal?.let {
             animalRepository.deleteById(it.id)
+            medicalRecordService.deleteById(it.medicalRecordId)
 
             log.makeLoggingEventBuilder(Level.INFO)
-                .setMessage("Animal was deleted with success.")
+                .setMessage("Animal was deleted with success with its medicalRecord.")
                 .addKeyValue("animalId", animal.id.toString())
                 .log()
 

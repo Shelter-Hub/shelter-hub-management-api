@@ -3,6 +3,8 @@ package br.com.shelterhubmanagementapi.controller
 import br.com.shelterhubmanagementapi.dto.request.MedicalRecordRequest
 import br.com.shelterhubmanagementapi.dto.response.MedicalRecordResponse
 import br.com.shelterhubmanagementapi.service.MedicalRecordService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -20,14 +22,14 @@ import java.util.UUID
 class MedicalRecordController(private val medicalRecordService: MedicalRecordService) {
     @GetMapping
     suspend fun getAll(): ResponseEntity<List<MedicalRecordResponse>> {
-        val medicalRecords = medicalRecordService.getAll()
-        return if (medicalRecords.isEmpty()) {
-            ResponseEntity.notFound()
-                .build()
-        } else {
-            ResponseEntity.ok(
-                medicalRecords,
-            )
+        return withContext(Dispatchers.IO) {
+            val medicalRecords = medicalRecordService.getAll()
+
+            if (medicalRecords.isEmpty()) {
+                ResponseEntity.notFound().build()
+            } else {
+                ResponseEntity.ok(medicalRecords)
+            }
         }
     }
 
@@ -35,9 +37,10 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
     suspend fun getById(
         @PathVariable id: UUID,
     ): ResponseEntity<MedicalRecordResponse> {
-        val medicalRecordOptional = medicalRecordService.getById(id)
-        return ResponseEntity
-            .of(medicalRecordOptional)
+        return withContext(Dispatchers.IO) {
+            val medicalRecord = medicalRecordService.getById(id)
+            ResponseEntity.ok(medicalRecord)
+        }
     }
 
     @PostMapping
@@ -59,15 +62,9 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
 
     @DeleteMapping("/{id}")
     suspend fun delete(
-        @PathVariable id: UUID?,
-    ): ResponseEntity<*> {
-        val medicalRecord = medicalRecordService.deleteById(id)
-        return if (medicalRecord.isPresent) {
-            ResponseEntity.noContent()
-                .build<Unit>()
-        } else {
-            ResponseEntity.notFound()
-                .build<Unit>()
-        }
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void> {
+        medicalRecordService.deleteById(id)
+        return ResponseEntity.accepted().build()
     }
 }
