@@ -3,7 +3,8 @@ package br.com.shelterhubmanagementapi.controller
 import br.com.shelterhubmanagementapi.dto.request.AnimalRequest
 import br.com.shelterhubmanagementapi.dto.response.AnimalResponse
 import br.com.shelterhubmanagementapi.service.AnimalService
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -27,26 +28,29 @@ class AnimalController(private val animalService: AnimalService) {
     suspend fun getById(
         @PathVariable id: UUID,
     ): AnimalResponse {
-        return animalService.getAnimalById(id)
+        return animalService.getAnimalById(id).await()
     }
 
     @GetMapping
-    suspend fun getAll(): ResponseEntity<Flow<AnimalResponse>> {
-        return animalService.getAll()
+    suspend fun getAll(): ResponseEntity<List<AnimalResponse>> {
+        val animals = animalService.getAll()
+        return ResponseEntity.ofNullable(animals.await())
     }
 
     @PostMapping
     suspend fun create(
         @RequestBody animalRequest: AnimalRequest,
-    ): ResponseEntity<AnimalResponse> {
-        val animal = animalService.create(animalRequest)
-        val id = animal.id.toString()
-        val location = URI.create(id)
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .location(location)
-            .body(animal)
-    }
+    ): ResponseEntity<AnimalResponse> =
+        withContext(Dispatchers.IO) {
+            val animal = animalService.create(animalRequest)
+            val id = animal.id.toString()
+            val location = URI.create(id)
+
+            ResponseEntity
+                .status(HttpStatus.CREATED)
+                .location(location)
+                .body(animal)
+        }
 
     @PutMapping("/{id}")
     suspend fun updateAnimal(
@@ -60,8 +64,9 @@ class AnimalController(private val animalService: AnimalService) {
     @DeleteMapping("/{id}")
     suspend fun deleteAnimal(
         @PathVariable id: UUID,
-    ): ResponseEntity<Void> {
-        animalService.deleteById(id)
-        return ResponseEntity.noContent().build()
-    }
+    ): ResponseEntity<Void> =
+        withContext(Dispatchers.IO) {
+            animalService.deleteById(id)
+            ResponseEntity.noContent().build()
+        }
 }

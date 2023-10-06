@@ -9,8 +9,12 @@ import br.com.shelterhubmanagementapi.exception.InvalidValueException
 import br.com.shelterhubmanagementapi.exception.PersistenceFailedException
 import br.com.shelterhubmanagementapi.exception.ResourceNotFoundException
 import br.com.shelterhubmanagementapi.repository.AnimalRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import org.springframework.stereotype.Service
@@ -28,9 +32,9 @@ class AnimalService(private val animalRepository: AnimalRepository) {
             val createdAnimal = animalRepository.save(animalRequest.toAnimal())
             log.makeLoggingEventBuilder(Level.INFO)
                 .setMessage("Animal was saved with success.")
-                .addKeyValue("animalId", createdAnimal?.id.toString())
+                .addKeyValue("animalId", createdAnimal.id)
                 .log()
-            createdAnimal!!.toResponse()
+            createdAnimal.toResponse()
         } catch (ex: Exception) {
             throw PersistenceFailedException(ex.localizedMessage)
         }
@@ -47,16 +51,23 @@ class AnimalService(private val animalRepository: AnimalRepository) {
         return updatedAnimal.toResponse()
     }
 
-    suspend fun getAll(): Flow<AnimalResponse> =
-        animalRepository
-            .findAll()
-            .mapNotNull { it.toResponse() }
+    suspend fun getAll(): Deferred<List<AnimalResponse>> =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                animalRepository
+                    .findAll()
+                    .mapNotNull { it.toResponse() }
+                    .toList()
+            }
+        }
 
-    suspend fun getAnimalById(animalId: UUID): AnimalResponse {
-        val animal = animalRepository.findById(animalId)
-
-        return animal?.toResponse() ?: throw ResourceNotFoundException()
-    }
+    suspend fun getAnimalById(animalId: UUID): Deferred<AnimalResponse> =
+        coroutineScope {
+            return@coroutineScope async(Dispatchers.IO) {
+                val animal = animalRepository.findById(animalId)
+                animal?.toResponse() ?: throw ResourceNotFoundException()
+            }
+        }
 
     suspend fun deleteById(animalId: UUID): AnimalResponse {
         val animal = animalRepository.findById(animalId)
