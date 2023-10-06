@@ -1,9 +1,10 @@
 package com.shelterhub.controller;
 
+import br.com.shelterhubmanagementapi.controller.MedicalRecordController;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shelterhub.dto.request.MedicalRecordRequest;
-import com.shelterhub.dto.response.MedicalRecordResponse;
-import com.shelterhub.service.MedicalRecordService;
+import br.com.shelterhubmanagementapi.dto.request.MedicalRecordRequest;
+import br.com.shelterhubmanagementapi.dto.response.MedicalRecordResponse;
+import br.com.shelterhubmanagementapi.service.MedicalRecordService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

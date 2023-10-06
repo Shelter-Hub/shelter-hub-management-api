@@ -1,10 +1,10 @@
 package com.shelterhub.utils;
 
-import com.shelterhub.domain.enums.AnimalType;
-import com.shelterhub.domain.enums.Gender;
-import com.shelterhub.domain.enums.Size;
-import com.shelterhub.dto.request.AnimalRequest;
-import com.shelterhub.dto.request.EstimatedAgeRequest;
+import br.com.shelterhubmanagementapi.domain.enums.AnimalType;
+import br.com.shelterhubmanagementapi.domain.enums.Gender;
+import br.com.shelterhubmanagementapi.domain.enums.Size;
+import br.com.shelterhubmanagementapi.dto.request.AnimalRequest;
+import br.com.shelterhubmanagementapi.dto.request.EstimatedAgeRequest;
 import net.datafaker.Faker;
 
 import java.util.UUID;

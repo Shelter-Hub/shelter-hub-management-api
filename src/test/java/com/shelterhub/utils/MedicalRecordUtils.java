@@ -1,7 +1,7 @@
 package com.shelterhub.utils;
 
-import com.shelterhub.domain.model.MedicalRecord;
-import com.shelterhub.dto.request.MedicalRecordRequest;
+import br.com.shelterhubmanagementapi.domain.model.MedicalRecord;
+import br.com.shelterhubmanagementapi.dto.request.MedicalRecordRequest;
 
 import java.util.UUID;
 

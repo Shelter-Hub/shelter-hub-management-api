@@ -1,12 +1,13 @@
 package com.shelterhub.service;
 
-import com.shelterhub.database.AnimalRepository;
-import com.shelterhub.domain.model.Animal;
-import com.shelterhub.dto.request.AnimalRequest;
-import com.shelterhub.dto.response.AnimalResponse;
-import com.shelterhub.exception.InvalidValueException;
-import com.shelterhub.exception.PersistenceFailedException;
-import com.shelterhub.exception.ResourceNotFoundException;
+import br.com.shelterhubmanagementapi.repository.AnimalRepository;
+import br.com.shelterhubmanagementapi.domain.model.Animal;
+import br.com.shelterhubmanagementapi.dto.request.AnimalRequest;
+import br.com.shelterhubmanagementapi.dto.response.AnimalResponse;
+import br.com.shelterhubmanagementapi.exception.InvalidValueException;
+import br.com.shelterhubmanagementapi.exception.PersistenceFailedException;
+import br.com.shelterhubmanagementapi.exception.ResourceNotFoundException;
+import br.com.shelterhubmanagementapi.service.AnimalService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -138,7 +139,7 @@ public class AnimalServiceTest {
 
         when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> animalService.delete(animalRequest.getId()));
+        assertThrows(ResourceNotFoundException.class, () -> animalService.deleteById(animalRequest.getId()));
         verify(animalRepository, times(1)).findById(animalRequest.getId());
     }
 
@@ -148,7 +149,7 @@ public class AnimalServiceTest {
 
         when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.of(animalRequest.toAnimal()));
 
-        AnimalResponse result = animalService.delete(animalRequest.getId());
+        AnimalResponse result = animalService.deleteById(animalRequest.getId());
 
         verify(animalRepository, times(1)).deleteById(animalRequest.getId());
         verify(animalRepository, times(1)).findById(animalRequest.getId());
@@ -162,7 +163,7 @@ public class AnimalServiceTest {
 
         when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> animalService.delete(animalRequest.getId()));
+        assertThrows(ResourceNotFoundException.class, () -> animalService.deleteById(animalRequest.getId()));
 
         verify(animalRepository, times(0)).deleteById(animalRequest.getId());
         verify(animalRepository, times(1)).findById(animalRequest.getId());

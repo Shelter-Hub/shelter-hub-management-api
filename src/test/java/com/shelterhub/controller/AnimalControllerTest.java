@@ -1,13 +1,13 @@
 package com.shelterhub.controller;
 
+import br.com.shelterhubmanagementapi.controller.AnimalController;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shelterhub.domain.enums.Gender;
-import com.shelterhub.domain.enums.Size;
-import com.shelterhub.dto.request.AnimalRequest;
-import com.shelterhub.dto.response.AnimalResponse;
-import com.shelterhub.exception.ResourceNotFoundException;
-import com.shelterhub.service.AnimalService;
-import lombok.SneakyThrows;
+import br.com.shelterhubmanagementapi.domain.enums.Gender;
+import br.com.shelterhubmanagementapi.domain.enums.Size;
+import br.com.shelterhubmanagementapi.dto.request.AnimalRequest;
+import br.com.shelterhubmanagementapi.dto.response.AnimalResponse;
+import br.com.shelterhubmanagementapi.exception.ResourceNotFoundException;
+import br.com.shelterhubmanagementapi.service.AnimalService;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,6 @@ public class AnimalControllerTest {
     private final String PATH_URL = "/v1/animal";
 
     @Test
-    @SneakyThrows
     public void shouldReturnAnimalById() {
         AnimalRequest animalRequest = buildAnimalDTO(true);
         UUID animalId = animalRequest.getId();
@@ -74,7 +73,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldNotGetAnimalByIdIfAnimalNotFound() {
         var animalId = UUID.randomUUID();
         when(animalService.getAnimalById(animalId)).thenThrow(ResourceNotFoundException.class);
@@ -87,7 +85,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldNotGetAnimalByIdIfUUIDIsNull() {
 
         mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL + "/{id}", "42d7caba-4869-42b2-af86-f340dd461882888"))
@@ -96,7 +93,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldReturnAllAnimals() {
         AnimalResponse firstAnimal = buildAnimalDTO(true).toAnimal().toResponse();
         AnimalResponse secondAnimal = buildAnimalDTO(true).toAnimal().toResponse();
@@ -121,7 +117,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldReturnNotFoundResponseWhenRepositoryIsEmpty() {
         when(animalService.getAll()).thenReturn(List.of());
 
@@ -135,7 +130,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldCreateAnimal() {
         AnimalRequest animalRequest = buildAnimalDTO(false);
         AnimalResponse animalResponse = animalRequest.toAnimal().toResponse();
@@ -157,7 +151,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldNotCreateAnimalWithInvalidSize() {
         AnimalRequest animalRequest = buildAnimalDTO(false);
 
@@ -176,7 +169,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldNotCreateAnimalWithInvalidGender() {
         AnimalRequest animalRequest = buildAnimalDTO(false);
 
@@ -197,7 +189,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldUpdateAnimal() {
         AnimalRequest animalRequest = buildAnimalDTO(true);
         UUID animalId = animalRequest.getId();
@@ -214,7 +205,6 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldNotUpdateAnimalIfAnimalNotFound() {
         AnimalRequest animalRequest = buildAnimalDTO(true);
         UUID animalId = animalRequest.getId();
@@ -231,32 +221,30 @@ public class AnimalControllerTest {
     }
 
     @Test
-    @SneakyThrows
     public void shouldDeleteAnimal() {
         AnimalRequest animalRequest = buildAnimalDTO(true);
         UUID animalId = animalRequest.getId();
         var animalResponse = animalRequest.toAnimal().toResponse();
-        when(animalService.delete(animalId)).thenReturn(animalResponse);
+        when(animalService.deleteById(animalId)).thenReturn(animalResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.delete(PATH_URL + "/{id}", animalId))
                 .andExpect(status().isNoContent());
 
-        verify(animalService, times(1)).delete(animalId);
+        verify(animalService, times(1)).deleteById(animalId);
         verifyNoMoreInteractions(animalService);
     }
 
     @Test
-    @SneakyThrows
     public void shouldNotDeleteAnimalIfAnimalNotFound() {
         AnimalRequest animalRequest = buildAnimalDTO(true);
         UUID animalId = animalRequest.getId();
 
-        when(animalService.delete(animalId)).thenThrow(ResourceNotFoundException.class);
+        when(animalService.deleteById(animalId)).thenThrow(ResourceNotFoundException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.delete(PATH_URL + "/{id}", animalId))
                 .andExpect(status().isNotFound());
 
-        verify(animalService, times(1)).delete(animalId);
+        verify(animalService, times(1)).deleteById(animalId);
         verifyNoMoreInteractions(animalService);
     }
 
