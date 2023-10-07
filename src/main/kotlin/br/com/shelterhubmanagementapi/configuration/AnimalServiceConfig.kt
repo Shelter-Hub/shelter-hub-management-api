@@ -12,5 +12,8 @@ class AnimalServiceConfig(
     private val medicalRecordService: MedicalRecordService,
 ) {
     @Bean
-    fun createAnimalService(animalRepository: AnimalRepository) = AnimalService(animalRepository, medicalRecordService)
+    fun createAnimalService(
+        animalRepository: AnimalRepository,
+        medicalRecordService: MedicalRecordService,
+    ) = AnimalService(animalRepository, medicalRecordService)
 }

@@ -8,4 +8,4 @@ data class EstimatedAgeRequest(
     val days: Int,
 )
 
-fun EstimatedAgeRequest.toLocalDate(): LocalDate = LocalDate(this.years, this.months, this.days)
+fun EstimatedAgeRequest.toLocalDate() = LocalDate(this.years, this.months, this.days)

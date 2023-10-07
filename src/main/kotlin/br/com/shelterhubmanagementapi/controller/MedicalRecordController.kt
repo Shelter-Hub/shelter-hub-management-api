@@ -3,8 +3,6 @@ package br.com.shelterhubmanagementapi.controller
 import br.com.shelterhubmanagementapi.dto.request.MedicalRecordRequest
 import br.com.shelterhubmanagementapi.dto.response.MedicalRecordResponse
 import br.com.shelterhubmanagementapi.service.MedicalRecordService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -22,14 +20,11 @@ import java.util.UUID
 class MedicalRecordController(private val medicalRecordService: MedicalRecordService) {
     @GetMapping
     suspend fun getAll(): ResponseEntity<List<MedicalRecordResponse>> {
-        return withContext(Dispatchers.IO) {
-            val medicalRecords = medicalRecordService.getAll()
-
-            if (medicalRecords.isEmpty()) {
-                ResponseEntity.notFound().build()
-            } else {
-                ResponseEntity.ok(medicalRecords)
-            }
+        val medicalRecords = medicalRecordService.getAll()
+        return if (medicalRecords.isEmpty()) {
+            ResponseEntity.notFound().build()
+        } else {
+            ResponseEntity.ok(medicalRecords)
         }
     }
 
@@ -37,10 +32,8 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
     suspend fun getById(
         @PathVariable id: UUID,
     ): ResponseEntity<MedicalRecordResponse> {
-        return withContext(Dispatchers.IO) {
-            val medicalRecord = medicalRecordService.getById(id)
-            ResponseEntity.ok(medicalRecord)
-        }
+        val medicalRecord = medicalRecordService.getById(id)
+        return ResponseEntity.ok(medicalRecord.await())
     }
 
     @PostMapping
@@ -48,7 +41,7 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
         @RequestBody medicalRecord: MedicalRecordRequest,
     ): ResponseEntity<MedicalRecordResponse> {
         val medicalResponse = medicalRecordService.create(medicalRecord)
-        return ResponseEntity.ofNullable(medicalResponse)
+        return ResponseEntity.ofNullable(medicalResponse.await())
     }
 
     @PutMapping("/{id}")
@@ -57,7 +50,7 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
         @RequestBody medicalRecord: MedicalRecordRequest,
     ): ResponseEntity<MedicalRecordResponse> {
         val medicalRecordPersisted = medicalRecordService.update(medicalRecord, id)
-        return ResponseEntity.ofNullable(medicalRecordPersisted)
+        return ResponseEntity.ofNullable(medicalRecordPersisted.await())
     }
 
     @DeleteMapping("/{id}")
