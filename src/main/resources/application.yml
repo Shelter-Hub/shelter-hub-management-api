@@ -8,18 +8,23 @@ server:
     key-store-password: '${TLS_KEYSTORE_SECRET:secret}'
 
 spring:
-  datasource:
-    url: 'jdbc:postgresql://localhost:5432/postgres'
+  r2dbc:
+    url: 'r2dbc:postgresql://localhost:5432/postgres'
     username: postgres
     password: postgres
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    show-sql: true
-    generate-ddl: true
+    pool:
+      enabled: false
+      initial-size: 5
+      max-size: 10
+#  jpa:
+#    show-sql: true
+#    generate-ddl: true
 
 logging:
   pattern:
     console: "%cyan(%d{HH:mm:ss.SSS}) %blue([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n"
   level:
     root: INFO
-    org.springframework.web: INFO
+    org.springframework:
+      web: INFO
+      r2dbc: DEBUG

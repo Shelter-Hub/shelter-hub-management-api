@@ -5,7 +5,7 @@ import br.com.shelterhubmanagementapi.domain.enums.Size
 import java.util.UUID
 
 data class AnimalResponse(
-    val id: UUID,
+    val id: String,
     val name: String,
     val identification: String,
     val behavior: String,

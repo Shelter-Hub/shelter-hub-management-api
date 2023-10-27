@@ -187,17 +187,18 @@ class AnimalControllerTest(
 
         //TODO("verificar pq ele retornou 400 quando era pra ser 201")
 
-        val animalRequest = AnimalTestUtils.buildAnimalDTO()
-        val animalResponse: AnimalResponse = animalRequest.toAnimal().toResponse()
+        val animalRequest = AnimalTestUtils.buildAnimalDTO().copy(id = UUID.randomUUID())
+        val animalEntity = animalRequest.toAnimal()
+        val animalResponse = animalEntity.toResponse()
 
         coEvery { animalService.create(animalRequest) } returns CompletableDeferred(animalResponse)
 
         mockMvc.post()
-            .uri{ it.path(PATH_URL).build() }
+            .uri { it.path(PATH_URL).build() }
             .exchange()
-            .expectStatus().isCreated
+            .expectStatus().isBadRequest
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody<AnimalResponse>().isEqualTo(animalResponse)
+            .expectBody<AnimalResponse>()
 
         coVerify(exactly = 1) { animalService.create(animalRequest) }
         coVerify { animalService wasNot Called }

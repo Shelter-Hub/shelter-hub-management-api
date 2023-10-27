@@ -4,7 +4,7 @@ import br.com.shelterhubmanagementapi.domain.enums.AnimalType
 import br.com.shelterhubmanagementapi.domain.enums.Gender
 import br.com.shelterhubmanagementapi.domain.enums.Size
 import br.com.shelterhubmanagementapi.dto.response.AnimalResponse
-import kotlinx.datetime.LocalDate
+import java.time.LocalDate
 import java.util.UUID
 
 data class Animal(
@@ -23,7 +23,7 @@ data class Animal(
 
 fun Animal.toResponse(): AnimalResponse =
     AnimalResponse(
-        id = this.id,
+        id = this.id.toString(),
         name = this.name,
         identification = this.identification,
         behavior = this.behavior,
