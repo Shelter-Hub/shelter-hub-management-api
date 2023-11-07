@@ -32,8 +32,14 @@ class AnimalController(private val animalService: AnimalService) {
 
     @GetMapping
     suspend fun getAll(): ResponseEntity<List<AnimalResponse>> {
-        val animals = animalService.getAll()
-        return ResponseEntity.ofNullable(animals.await())
+        val animals = animalService.getAll().await()
+
+        if (animals.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        }
+
+        return ResponseEntity
+            .ok(animals)
     }
 
     @PostMapping

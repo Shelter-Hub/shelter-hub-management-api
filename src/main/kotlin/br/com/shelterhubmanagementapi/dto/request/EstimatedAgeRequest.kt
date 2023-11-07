@@ -1,8 +1,6 @@
 package br.com.shelterhubmanagementapi.dto.request
 
-//import kotlinx.datetime.LocalDate
 import java.time.LocalDate
-//import kotlinx.serialization.Serializable
 
 data class EstimatedAgeRequest(
     val years: Int,
