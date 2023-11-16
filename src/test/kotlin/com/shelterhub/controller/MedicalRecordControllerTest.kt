@@ -1,168 +1,151 @@
-package com.shelterhub.controller;
+package com.shelterhub.controller
 
-import br.com.shelterhubmanagementapi.controller.MedicalRecordController;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import br.com.shelterhubmanagementapi.dto.request.MedicalRecordRequest;
-import br.com.shelterhubmanagementapi.dto.response.MedicalRecordResponse;
-import br.com.shelterhubmanagementapi.service.MedicalRecordService;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import br.com.shelterhubmanagementapi.controller.MedicalRecordController
+import br.com.shelterhubmanagementapi.domain.model.toResponse
+import br.com.shelterhubmanagementapi.dto.request.toMedicalRecord
+import br.com.shelterhubmanagementapi.dto.response.AnimalResponse
+import br.com.shelterhubmanagementapi.dto.response.MedicalRecordResponse
+import br.com.shelterhubmanagementapi.exception.GlobalExceptionHandler
+import br.com.shelterhubmanagementapi.service.MedicalRecordService
+import com.ninjasquad.springmockk.MockkBean
+import com.shelterhub.utils.MedicalRecordUtils
+import io.mockk.Called
+import io.mockk.coEvery
+import io.mockk.coVerify
+import kotlinx.coroutines.CompletableDeferred
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.http.MediaType
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.expectBody
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+@WebFluxTest(controllers = [MedicalRecordController::class])
+@ContextConfiguration(classes = [MedicalRecordController::class, MedicalRecordService::class, GlobalExceptionHandler::class])
+class MedicalRecordControllerTest(
+    @Autowired private val webTestClient: WebTestClient,
+) {
+    private val PATH_URL = "/v1/medical-record"
 
-import static com.shelterhub.utils.MedicalRecordUtils.buildMedicalRecord;
-import static com.shelterhub.utils.MedicalRecordUtils.buildMedicalRecordRequest;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-@WebMvcTest(MedicalRecordController.class)
-public class MedicalRecordControllerTest {
-
-    private final String PATH_URL = "/v1/medical-record";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private MedicalRecordService medicalRecordService;
-
+    @MockkBean
+    private lateinit var  medicalRecordService: MedicalRecordService
     @Test
-    public void shouldReturnAllMedicalRecords() throws Exception {
-        MedicalRecordResponse firstMedicalRecord = buildMedicalRecordRequest().toMedicalRecord().toResponse();
-        MedicalRecordResponse secondMedicalRecord = buildMedicalRecordRequest().toMedicalRecord().toResponse();
+    fun `should return all medical records`() {
+        val firstMedicalRecord: MedicalRecordResponse =
+            MedicalRecordUtils.buildMedicalRecordResponse()
 
-        when(medicalRecordService.getAll()).thenReturn(List.of(firstMedicalRecord, secondMedicalRecord));
+        val secondMedicalRecord: MedicalRecordResponse =
+            MedicalRecordUtils.buildMedicalRecordResponse()
 
-        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value(firstMedicalRecord.getId().toString()))
-                .andExpect(jsonPath("$[0].animalId").value(firstMedicalRecord.getAnimalId().toString()))
-                .andExpect(jsonPath("$[1].id").value(secondMedicalRecord.getId().toString()))
-                .andExpect(jsonPath("$[1].animalId").value(secondMedicalRecord.getAnimalId().toString()));
+        coEvery { medicalRecordService.getAll() } returns CompletableDeferred(List.of(firstMedicalRecord, secondMedicalRecord))
 
-        verify(medicalRecordService, times(1)).getAll();
-        verifyNoMoreInteractions(medicalRecordService);
+        webTestClient.get()
+            .uri { it.path(PATH_URL).build() }
+            .exchange()
+            .expectStatus().isOk
+            .expectHeader().contentType(MediaType.APPLICATION_JSON)
+            .expectBody<List<MedicalRecordResponse>>()
+
+        coVerify(exactly = 1) { medicalRecordService.getAll() }
+        coVerify { medicalRecordService.getAll() wasNot Called }
     }
 
     @Test
-    public void shouldReturnNotFoundWhenAllMedicalRecordsDoesNotExists() throws Exception {
-        when(medicalRecordService.getAll()).thenReturn(new ArrayList<>());
+    fun `should return not found when all medical records does not exist`() {
+        coEvery { medicalRecordService.getAll() } returns CompletableDeferred(emptyList())
 
-        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL))
-                .andExpect(status().isNotFound());
+        webTestClient.get()
+            .uri { it.path(PATH_URL).build() }
+            .exchange()
+            .expectStatus().isNotFound
 
-        verify(medicalRecordService, times(1)).getAll();
-        verifyNoMoreInteractions(medicalRecordService);
-    }
-
-
-    @Test
-    public void shouldReturnMedicalRecordById() throws Exception {
-        var medicalRecordRequest = buildMedicalRecordRequest();
-        var medicalRecordId = medicalRecordRequest.getId();
-
-        var medicalResponse = medicalRecordRequest
-                .toMedicalRecord()
-                .toResponse();
-
-        when(medicalRecordService.getById(medicalRecordId))
-                .thenReturn(Optional.of(medicalResponse));
-
-        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL + "/{id}", medicalRecordId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(medicalResponse.getId().toString()))
-                .andExpect(jsonPath("$.animalId").value(medicalResponse.getAnimalId().toString()));
-
-
-        verify(medicalRecordService, times(1)).getById(medicalRecordId);
-        verifyNoMoreInteractions(medicalRecordService);
+        coVerify(exactly = 1) { medicalRecordService.getAll() }
+        coVerify { medicalRecordService.getAll() wasNot Called }
     }
 
     @Test
-    public void shouldReturnNotFoundWhenMedicalRecordDoesNotExist() throws Exception {
-        var uuid = UUID.randomUUID();
-        when(medicalRecordService.getById(uuid))
-                .thenReturn(Optional.empty());
+    fun `should return medical record by id`() {
+        val medicalRecordRequest = MedicalRecordUtils.buildMedicalRecordRequest()
+        val medicalRecordId = medicalRecordRequest.id
+        val medicalResponse = MedicalRecordUtils.buildMedicalRecordResponse()
 
-        mockMvc.perform(MockMvcRequestBuilders.get(PATH_URL + "/{id}", uuid.toString()))
-                .andExpect(status().isNotFound());
+        coEvery { medicalRecordService.getById(medicalRecordId) } returns CompletableDeferred(medicalResponse)
 
-        verify(medicalRecordService, times(1)).getById(uuid);
-        verifyNoMoreInteractions(medicalRecordService);
+        webTestClient.get().uri { uriBuilder -> uriBuilder
+            .path("$PATH_URL/{id}")
+            .build(medicalRecordId)
+        }.exchange()
+            .expectStatus().isOk
+            .expectBody<MedicalRecordResponse>()
+
+        coVerify { medicalRecordService.getById(medicalRecordId) wasNot Called }
     }
 
     @Test
-    public void shouldCreateMedicalRecordSuccessfully() throws Exception {
-        MedicalRecordRequest medicalRecordRequest = buildMedicalRecordRequest();
-        var medicalRecord = medicalRecordRequest.toMedicalRecord();
-        var medicalRecordResponse = medicalRecord.toResponse();
+    fun `should return not found when medical record does not exist`() {
+        coEvery { medicalRecordService.getAll() } returns CompletableDeferred(emptyList())
 
-        when(medicalRecordService.create(medicalRecordRequest)).thenReturn(medicalRecordResponse);
+        webTestClient.get()
+            .uri { it.path(PATH_URL).build() }
+            .exchange()
+            .expectStatus().isNotFound
 
-        mockMvc.perform(MockMvcRequestBuilders.post(PATH_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(medicalRecordRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(medicalRecordResponse.getId().toString()))
-                .andExpect(jsonPath("$.animalId").value(medicalRecordResponse.getAnimalId().toString()));
-
-        verify(medicalRecordService, times(1)).create(any());
-        verifyNoMoreInteractions(medicalRecordService);
+        coVerify(exactly = 1) {medicalRecordService.getAll() }
     }
 
     @Test
-    public void shouldUpdateMedicalRecordSuccessfully() throws Exception {
-        var medicalRecordRequest = buildMedicalRecordRequest();
-        var medicalRecordId = medicalRecordRequest.getId();
-        var medicalRecord = medicalRecordRequest.toMedicalRecord();
-        var medicalRecordResponse = medicalRecord.toResponse();
+    fun `should create medical record successfully`() {
+        val medicalRecordRequest = MedicalRecordUtils.buildMedicalRecordRequest()
+        val medicalRecord = medicalRecordRequest.toMedicalRecord()
+        val medicalRecordResponse = medicalRecord.toResponse()
 
-        when(medicalRecordService.update(medicalRecordRequest, medicalRecordId))
-                .thenReturn(medicalRecordResponse);
+        coEvery { medicalRecordService.create(medicalRecordRequest) } returns CompletableDeferred(medicalRecordResponse)
 
-        mockMvc.perform(MockMvcRequestBuilders.put(PATH_URL + "/{id}", medicalRecordId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(medicalRecordRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(medicalRecordId.toString()))
-                .andExpect(jsonPath("$.animalId").value(medicalRecordResponse.getAnimalId().toString()));
+        webTestClient.post()
+            .uri { it.path(PATH_URL).build() }
+            .bodyValue(medicalRecordRequest)
+            .exchange()
+            .expectStatus().isCreated
+            .expectHeader().contentType(MediaType.APPLICATION_JSON)
+            .expectBody<AnimalResponse>()
 
-        verify(medicalRecordService, times(1)).update(medicalRecordRequest, medicalRecordId);
-        verifyNoMoreInteractions(medicalRecordService);
+        coVerify(exactly = 1) { medicalRecordService }
     }
 
     @Test
-    public void shouldDeleteMedicalRecordSuccessfully() throws Exception {
-        var medicalRecord = buildMedicalRecord();
-        var medicalRecordId = buildMedicalRecord().getId();
+    fun `should update medical record successfully`() {
+        val medicalRecordRequest = MedicalRecordUtils.buildMedicalRecordRequest()
+        val medicalRecordId = medicalRecordRequest.id
+        val medicalRecord = medicalRecordRequest.toMedicalRecord()
+        val medicalRecordResponse = medicalRecord.toResponse()
 
-        when(medicalRecordService.deleteById(medicalRecordId))
-                .thenReturn(Optional.of(medicalRecord));
+        coEvery { medicalRecordService.update(medicalRecordRequest, medicalRecordId) } returns CompletableDeferred(medicalRecordResponse)
 
-        mockMvc.perform(MockMvcRequestBuilders.delete(PATH_URL + "/{id}", medicalRecordId))
-                .andExpect(status().isNoContent());
+        webTestClient.post()
+            .uri { it.path(PATH_URL).build() }
+            .bodyValue(medicalRecordResponse)
+            .exchange()
+            .expectStatus().isCreated
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
+            .expectBody<AnimalResponse>()
 
-        verify(medicalRecordService, times(1)).deleteById(any());
-        verifyNoMoreInteractions(medicalRecordService);
+        coVerify { medicalRecordService.update(medicalRecordRequest, medicalRecordId) }
+    }
+
+    @Test
+    fun `should delete medical record successfully`() {
+        val medicalRecordId = MedicalRecordUtils.buildMedicalRecord().id
+
+        webTestClient.delete()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("$PATH_URL/{id}")
+                    .build(medicalRecordId)
+            }.exchange()
+            .expectStatus().isNotFound
+
+        coVerify(exactly = 1) { medicalRecordService.deleteById(medicalRecordId) }
     }
 }

@@ -33,7 +33,7 @@ class AnimalControllerTest(
     @MockkBean
     private lateinit var animalService: AnimalService
 
-    private val pathUrl = "/v1/animal"
+    private val PATH_URL = "/v1/animal"
 
     @Test
     fun `should return animal by id`() {
@@ -43,32 +43,32 @@ class AnimalControllerTest(
             animalRequest.toAnimal()
                 .toResponse()
 
-        coEvery { animalService.getAnimalById(animalId) } returns CompletableDeferred(animalResponse)
+        coEvery { animalService.getById(animalId) } returns CompletableDeferred(animalResponse)
 
-        webTestClient.get().uri { uriBuilder -> uriBuilder.path("$pathUrl/{id}").build(animalId) }
+        webTestClient.get().uri { uriBuilder -> uriBuilder.path("$PATH_URL/{id}").build(animalId) }
             .exchange()
             .expectStatus().isOk
             .expectBody<AnimalResponse>()
 
-        coVerify { animalService.getAnimalById(animalId) wasNot Called }
+        coVerify { animalService.getById(animalId) wasNot Called }
     }
 
     @Test
     fun `should not get animal by id if animal was not found`() {
         val animalId = UUID.randomUUID()
 
-        coEvery { animalService.getAnimalById(animalId) } throws ResourceNotFoundException()
+        coEvery { animalService.getById(animalId) } throws ResourceNotFoundException()
 
         webTestClient.get()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$pathUrl/{id}")
+                    .path("$PATH_URL/{id}")
                     .build(animalId)
             }
             .exchange()
             .expectStatus().value { HttpStatus.NOT_FOUND }
 
-        coVerify { animalService.getAnimalById(animalId) wasNot Called }
+        coVerify { animalService.getById(animalId) wasNot Called }
     }
 
     @Test
@@ -76,7 +76,7 @@ class AnimalControllerTest(
         webTestClient.get()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$pathUrl/{id}")
+                    .path("$PATH_URL/{id}")
                     .build(null)
             }
             .exchange()
@@ -91,7 +91,7 @@ class AnimalControllerTest(
         coEvery { animalService.getAll() } returns CompletableDeferred(listOf(firstAnimal, secondAnimal))
 
         webTestClient.get()
-            .uri { it.path(pathUrl).build() }
+            .uri { it.path(PATH_URL).build() }
             .exchange()
             .expectStatus().isOk
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -102,11 +102,11 @@ class AnimalControllerTest(
     }
 
     @Test
-    fun `should return not found response when repository is empty in get all animals`() {
+    fun `should return not found when all animals does not exist`() {
         coEvery { animalService.getAll() } returns CompletableDeferred(emptyList())
 
         webTestClient.get()
-            .uri { it.path(pathUrl).build() }
+            .uri { it.path(PATH_URL).build() }
             .exchange()
             .expectStatus().isNotFound
 
@@ -115,7 +115,7 @@ class AnimalControllerTest(
     }
 
     @Test
-    fun `should create animal`() {
+    fun `should create animal successfully`() {
         val animalRequest = AnimalTestUtils.buildAnimalDTO().copy(id = UUID.randomUUID())
         val animalEntity = animalRequest.toAnimal()
         val animalResponse = animalEntity.toResponse()
@@ -123,7 +123,7 @@ class AnimalControllerTest(
         coEvery { animalService.create(animalRequest) } returns CompletableDeferred(animalResponse)
 
         webTestClient.post()
-            .uri { it.path(pathUrl).build() }
+            .uri { it.path(PATH_URL).build() }
             .bodyValue(animalRequest)
             .exchange()
             .expectStatus().isCreated
@@ -143,7 +143,7 @@ class AnimalControllerTest(
                 .replace("\"size\":\"" + animalRequest.size + "\"", "\"size\":\"$invalidSize\"")
 
         webTestClient.post()
-            .uri { it.path(pathUrl).build() }
+            .uri { it.path(PATH_URL).build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(invalidJsonPayload)
             .exchange()
@@ -162,7 +162,7 @@ class AnimalControllerTest(
                     "\"gender\":\"$invalidGender\"",
                 )
         webTestClient.post()
-            .uri { it.path(pathUrl).build() }
+            .uri { it.path(PATH_URL).build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(invalidJsonPayload)
             .exchange()
@@ -185,7 +185,7 @@ class AnimalControllerTest(
         webTestClient.put()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$pathUrl/{id}")
+                    .path("$PATH_URL/{id}")
                     .build(id)
             }
             .bodyValue(animalRequest)
@@ -207,7 +207,7 @@ class AnimalControllerTest(
         webTestClient.put()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$pathUrl/{id}")
+                    .path("$PATH_URL/{id}")
                     .build(id)
             }
             .bodyValue(animalRequest)
@@ -230,7 +230,7 @@ class AnimalControllerTest(
         webTestClient.delete()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$pathUrl/{id}")
+                    .path("$PATH_URL/{id}")
                     .build(id)
             }
             .exchange()
@@ -248,7 +248,7 @@ class AnimalControllerTest(
         webTestClient.delete()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$pathUrl/{id}")
+                    .path("$PATH_URL/{id}")
                     .build(id)
             }
             .exchange()

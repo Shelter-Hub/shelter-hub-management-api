@@ -27,7 +27,7 @@ class AnimalController(private val animalService: AnimalService) {
     suspend fun getById(
         @PathVariable id: UUID,
     ): AnimalResponse {
-        return animalService.getAnimalById(id).await()
+        return animalService.getById(id).await()
     }
 
     @GetMapping

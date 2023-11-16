@@ -126,7 +126,7 @@ public class AnimalServiceTest {
 
         when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.of(animalRequest.toAnimal()));
 
-        AnimalResponse result = animalService.getAnimalById(animalRequest.getId());
+        AnimalResponse result = animalService.getById(animalRequest.getId());
 
         assertEquals(animalRequest.getId(), result.getId());
         assertAnimalDTO(animalRequest, result);

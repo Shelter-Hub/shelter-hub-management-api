@@ -75,7 +75,7 @@ class AnimalService(
             }
         }
 
-    suspend fun getAnimalById(animalId: UUID): Deferred<AnimalResponse> =
+    suspend fun getById(animalId: UUID): Deferred<AnimalResponse> =
         coroutineScope {
             async(Dispatchers.IO) {
                 val animal = animalRepository.findById(animalId)

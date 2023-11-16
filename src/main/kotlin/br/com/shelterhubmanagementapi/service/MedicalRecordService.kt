@@ -70,12 +70,14 @@ class MedicalRecordService(
             }
         }
 
-    suspend fun getAll(): List<MedicalRecordResponse> =
-        withContext(Dispatchers.IO) {
-            medicalRecordRepository
-                .findAll()
-                .mapNotNull { it.toResponse() }
-                .toList()
+    suspend fun getAll(): Deferred<List<MedicalRecordResponse>> =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                medicalRecordRepository
+                    .findAll()
+                    .mapNotNull { it.toResponse() }
+                    .toList()
+            }
         }
 
     suspend fun getById(medicalRecordId: UUID): Deferred<MedicalRecordResponse> =
