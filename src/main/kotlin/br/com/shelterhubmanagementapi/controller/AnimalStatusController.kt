@@ -1,8 +1,9 @@
 package br.com.shelterhubmanagementapi.controller
 
-import br.com.shelterhubmanagementapi.dto.request.AnimalRequest
-import br.com.shelterhubmanagementapi.dto.response.AnimalResponse
-import br.com.shelterhubmanagementapi.service.AnimalService
+import br.com.shelterhubmanagementapi.dto.request.AnimalStatusRequest
+import br.com.shelterhubmanagementapi.dto.response.AnimalStatusResponse
+import br.com.shelterhubmanagementapi.service.AnimalStatusService
+import br.com.shelterhubmanagementapi.dto.response.StatusResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -19,52 +20,74 @@ import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 import java.util.UUID
 
+
 @RestController
-@RequestMapping(value = ["v1/animal"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class AnimalController(private val animalService: AnimalService) {
+@RequestMapping(value = ["v1/animalStatus"], produces = [MediaType.APPLICATION_JSON_VALUE])
+class AnimalStatusController (private val animalStatusService: AnimalStatusService) {
+
     @GetMapping("/{id}")
     @ResponseBody
+
     suspend fun getById(
         @PathVariable id: UUID,
-    ): AnimalResponse {
-        return animalService.getAnimalById(id).await()
+    ) : StatusResponse {
+        return animalStatusService.getStatusById(id).await()
     }
 
     @GetMapping
-    suspend fun getAll(): ResponseEntity<List<AnimalResponse>> {
-        val animals = animalService.getAll()
-        return ResponseEntity.ofNullable(animals.await())
+    suspend fun getAll(): ReponseEntity<List<AnimalStatusResponse>> {
+        val animalStatus = animalStatusService.getAll()
+        return ResponseEntity.ofNullable(animalStatus.await())
     }
 
     @PostMapping
     suspend fun create(
-        @RequestBody animalRequest: AnimalRequest,
-    ): ResponseEntity<AnimalResponse> {
-        val animal = animalService.create(animalRequest).await()
-        val id = animal.id.toString()
+        @RequestBody animalStatusRequest: AnimalStatusRequest,
+    ): ResponseEntity<AnimalStatusResponse> {
+        val animalStatus = animalStatusService.create(animalStatusRequest).await()
+        val id = animalStatus.id.toString()
         val location = URI.create(id)
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .location(location)
-            .body(animal)
+            .body(animalStatus)
     }
 
     @PutMapping("/{id}")
-    suspend fun updateAnimal(
+    suspend fun updateAnimalStatus(
         @PathVariable id: UUID,
-        @RequestBody animal: AnimalRequest,
+        @RequestBody animalStatus: AnimalStatusRequest,
         serverHttpRequest: ServerHttpRequest,
     ): ResponseEntity<Any> {
-        val (savedAnimal) = animalService.updateById(animal, id)
-        return ResponseEntity.ok(savedAnimal.await())
+        val (savedAnimalStatus) = animalStatusService.updateById(animalStatus, id)
+        return ResponseEntity.ok(savedAnimalStatus.await())
     }
 
     @DeleteMapping("/{id}")
     suspend fun deleteAnimal(
         @PathVariable id: UUID,
     ): ResponseEntity<Void> {
-        animalService.deleteById(id)
+        animalStatusService.deleteById(id)
         return ResponseEntity.noContent().build()
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+)
