@@ -14,7 +14,6 @@ import com.shelterhub.utils.AnimalTestUtils
 import io.mockk.Called
 import io.mockk.coEvery
 import io.mockk.coVerify
-import java.util.UUID
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,6 +25,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import java.util.UUID
 
 /*
 @WebMvcTest(controllers = [AnimalController::class])
@@ -76,7 +76,7 @@ class AnimalControllerTest() : StringSpec() {
 @WebFluxTest(controllers = [AnimalController::class])
 @ContextConfiguration(classes = [AnimalController::class, AnimalService::class])
 class AnimalControllerTest(
-    @Autowired private val mockMvc: WebTestClient,
+    @Autowired private val mockMvc: WebTestClient
 ) {
     @MockkBean
     private lateinit var animalService: AnimalService
@@ -121,19 +121,18 @@ class AnimalControllerTest(
         coEvery { animalService.getAnimalById(animalId) } throws ResourceNotFoundException()
 
         mockMvc.get()
-            .uri{ uriBuilder -> uriBuilder.path("$PATH_URL/{id}").build(animalId) }
+            .uri { uriBuilder -> uriBuilder.path("$PATH_URL/{id}").build(animalId) }
             .exchange()
             .expectStatus().value { HttpStatus.INTERNAL_SERVER_ERROR }
 
         coVerify { animalService.getAnimalById(animalId) wasNot Called }
     }
 
-
     @Test
     fun `should not get animal by id if UUID is null`() {
 //        TODO("verificar pq ele retornou 404 quando era pra ser 400")
         mockMvc.get()
-            .uri{ uriBuilder -> uriBuilder.path("$PATH_URL/{id}").build(null) }
+            .uri { uriBuilder -> uriBuilder.path("$PATH_URL/{id}").build(null) }
             .exchange()
             .expectStatus().isNotFound
     }
@@ -146,7 +145,7 @@ class AnimalControllerTest(
         coEvery { animalService.getAll() } returns CompletableDeferred(listOf(firstAnimal, secondAnimal))
 
         mockMvc.get()
-            .uri{ it.path(PATH_URL).build() }
+            .uri { it.path(PATH_URL).build() }
             .exchange()
             .expectStatus().isOk
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -165,14 +164,13 @@ class AnimalControllerTest(
     }
 
     @Test
-    fun `should return not found response when repository is empty in get all animals`(){
-
-        //TODO("verificar pq ele retornou 200 quando era pra ser 404")
+    fun `should return not found response when repository is empty in get all animals`() {
+        // TODO("verificar pq ele retornou 200 quando era pra ser 404")
 
         coEvery { animalService.getAll() } returns CompletableDeferred(emptyList())
 
         mockMvc.get()
-            .uri{ it.path(PATH_URL).build() }
+            .uri { it.path(PATH_URL).build() }
             .exchange()
             .expectStatus().isOk
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -183,9 +181,8 @@ class AnimalControllerTest(
     }
 
     @Test
-    fun `should create animal`(){
-
-        //TODO("verificar pq ele retornou 400 quando era pra ser 201")
+    fun `should create animal`() {
+        // TODO("verificar pq ele retornou 400 quando era pra ser 201")
 
         val animalRequest = AnimalTestUtils.buildAnimalDTO()
         val animalResponse: AnimalResponse = animalRequest.toAnimal().toResponse()
@@ -193,7 +190,7 @@ class AnimalControllerTest(
         coEvery { animalService.create(animalRequest) } returns CompletableDeferred(animalResponse)
 
         mockMvc.post()
-            .uri{ it.path(PATH_URL).build() }
+            .uri { it.path(PATH_URL).build() }
             .exchange()
             .expectStatus().isCreated
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -202,9 +199,7 @@ class AnimalControllerTest(
         coVerify(exactly = 1) { animalService.create(animalRequest) }
         coVerify { animalService wasNot Called }
     }
-
 }
-
 
 /*
     @Test

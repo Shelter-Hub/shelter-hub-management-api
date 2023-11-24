@@ -13,9 +13,9 @@ import org.slf4j.event.Level
 
 
 @Service
-class StatusService{
+class StatusService(
     private val StatusRepository: StatusRepository,
-    private val AnimalReposity: AnimalRepository,
+    private val AnimalReposity: AnimalRepository
     ) {
         private val log = loggerFactory.getLogger(StatusService::class.java)
 
@@ -27,9 +27,11 @@ class StatusService{
                         .setMessage("Status was saved succesfully!")
                         .addKeyValue("statusId", createdStatus.id)
                         .log()
+                    createdStatus.toResponse()
 
                 }
             }
+    }
 
 
 

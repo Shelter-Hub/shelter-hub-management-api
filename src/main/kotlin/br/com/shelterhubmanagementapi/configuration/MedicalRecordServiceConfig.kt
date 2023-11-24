@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class MedicalRecordServiceConfig(
-    private val medicalRecordRepository: MedicalRecordRepository,
+    private val medicalRecordRepository: MedicalRecordRepository
 ) {
     @Bean
     fun createMedicalRecordService(medicalRecordRepository: MedicalRecordRepository) = MedicalRecordService(medicalRecordRepository)

@@ -25,7 +25,7 @@ class AnimalController(private val animalService: AnimalService) {
     @GetMapping("/{id}")
     @ResponseBody
     suspend fun getById(
-        @PathVariable id: UUID,
+        @PathVariable id: UUID
     ): AnimalResponse {
         return animalService.getAnimalById(id).await()
     }
@@ -38,7 +38,7 @@ class AnimalController(private val animalService: AnimalService) {
 
     @PostMapping
     suspend fun create(
-        @RequestBody animalRequest: AnimalRequest,
+        @RequestBody animalRequest: AnimalRequest
     ): ResponseEntity<AnimalResponse> {
         val animal = animalService.create(animalRequest).await()
         val id = animal.id.toString()
@@ -54,7 +54,7 @@ class AnimalController(private val animalService: AnimalService) {
     suspend fun updateAnimal(
         @PathVariable id: UUID,
         @RequestBody animal: AnimalRequest,
-        serverHttpRequest: ServerHttpRequest,
+        serverHttpRequest: ServerHttpRequest
     ): ResponseEntity<Any> {
         val (savedAnimal) = animalService.updateById(animal, id)
         return ResponseEntity.ok(savedAnimal.await())
@@ -62,7 +62,7 @@ class AnimalController(private val animalService: AnimalService) {
 
     @DeleteMapping("/{id}")
     suspend fun deleteAnimal(
-        @PathVariable id: UUID,
+        @PathVariable id: UUID
     ): ResponseEntity<Void> {
         animalService.deleteById(id)
         return ResponseEntity.noContent().build()

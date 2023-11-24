@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class AnimalServiceConfig(
     private val animalRepository: AnimalRepository,
-    private val medicalRecordService: MedicalRecordService,
+    private val medicalRecordService: MedicalRecordService
 ) {
     @Bean
     fun createAnimalService(
         animalRepository: AnimalRepository,
-        medicalRecordService: MedicalRecordService,
+        medicalRecordService: MedicalRecordService
     ) = AnimalService(animalRepository, medicalRecordService)
 }

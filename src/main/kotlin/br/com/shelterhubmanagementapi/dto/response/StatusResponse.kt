@@ -1,8 +1,8 @@
 package br.com.shelterhubmanagementapi.dto.response
 
-import java.util.UUID
+import java.util.*
 
-class StatusResponse {
+data class StatusResponse (
     val id: UUID,
     val name: String,
-}
+)

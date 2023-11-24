@@ -22,7 +22,7 @@ object AnimalTestUtils {
             medicalRecordId = UUID.randomUUID(),
             animalType = AnimalType.Canine.toString(),
             gender = Gender.FEMALE,
-            size = Size.SMALL,
+            size = Size.SMALL
         )
     }
 
@@ -39,7 +39,7 @@ object AnimalTestUtils {
             medicalRecordId = UUID.randomUUID(),
             animalType = AnimalType.Canine.toString(),
             gender = Gender.FEMALE,
-            size = Size.SMALL,
+            size = Size.SMALL
         )
     }
 }

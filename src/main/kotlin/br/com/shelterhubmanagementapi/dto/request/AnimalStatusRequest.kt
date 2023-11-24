@@ -1,21 +1,23 @@
 package br.com.shelterhubmanagementapi.dto.request
 
 import br.com.shelterhubmanagementapi.domain.model.AnimalStatus
-import com.fasterxml.jackson.databind.deser.std.UUIDDeserializer
+import kotlinx.datetime.LocalDate
 import java.util.UUID
 
 data class AnimalStatusRequest(
-    val id: UUID = UUID.randomUUID(),
-    val animalId: UUID.randomUUID(),
-    val createDate:
-    val statusId: UUID,
+    val id: Long,
+    val animalId: UUID,
+    val createDate: LocalDate,
+    val statusId: Int,
 )
 
-fun AnimalStatusRequest.toAnimalStatusRequest() =
+fun AnimalStatusRequest.toAnimalStatus() =
     AnimalStatus(
         id = this.id,
-        animalId = this.id,
+        animalId = this.animalId,
         createDate = this.createDate,
-        statusId = this.id,
-    )
+        statusId = this.statusId,
+        )
+
+
 

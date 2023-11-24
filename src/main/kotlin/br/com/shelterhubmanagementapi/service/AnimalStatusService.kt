@@ -26,7 +26,7 @@ class AnimalStatusService (
                     .setMessage("Animal Status was saved succesfully! ")
                     .addKeyValue("animalStatusId", createdAnimalStatus.id)
                     .log()
-                createdAnimalStatus.
+                createdAnimalStatus.toAnimalStatusRequest()
             }
 
 
