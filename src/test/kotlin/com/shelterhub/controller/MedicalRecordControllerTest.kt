@@ -13,6 +13,8 @@ import io.mockk.Called
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.Job
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
@@ -108,11 +110,11 @@ class MedicalRecordControllerTest(
             .uri { it.path(PATH_URL).build() }
             .bodyValue(medicalRecordRequest)
             .exchange()
-            .expectStatus().isCreated
+            .expectStatus().isOk
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody<AnimalResponse>()
+            .expectBody<MedicalRecordResponse>()
 
-        coVerify(exactly = 1) { medicalRecordService }
+        coVerify(exactly = 1) { medicalRecordService.create(medicalRecordRequest) }
     }
 
     @Test
@@ -124,14 +126,14 @@ class MedicalRecordControllerTest(
 
         coEvery { medicalRecordService.update(medicalRecordRequest, medicalRecordId) } returns CompletableDeferred(medicalRecordResponse)
 
-        webTestClient.post()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient.put()
+            .uri { it.path("$PATH_URL/{id}").build(medicalRecordId) }
             .bodyValue(medicalRecordResponse)
             .exchange()
-            .expectStatus().isCreated
+            .expectStatus().isOk
             .expectHeader()
             .contentType(MediaType.APPLICATION_JSON)
-            .expectBody<AnimalResponse>()
+            .expectBody<MedicalRecordResponse>()
 
         coVerify { medicalRecordService.update(medicalRecordRequest, medicalRecordId) }
     }
@@ -140,13 +142,15 @@ class MedicalRecordControllerTest(
     fun `should delete medical record successfully`() {
         val medicalRecordId = MedicalRecordUtils.buildMedicalRecord().id
 
+        coEvery { medicalRecordService.deleteById(medicalRecordId) } returns Job()
+
         webTestClient.delete()
             .uri { uriBuilder ->
                 uriBuilder
                     .path("$PATH_URL/{id}")
                     .build(medicalRecordId)
             }.exchange()
-            .expectStatus().isNotFound
+            .expectStatus().isAccepted
 
         coVerify(exactly = 1) { medicalRecordService.deleteById(medicalRecordId) }
     }
