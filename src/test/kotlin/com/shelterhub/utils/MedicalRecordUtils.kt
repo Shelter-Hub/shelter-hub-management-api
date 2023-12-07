@@ -6,18 +6,21 @@ import br.com.shelterhubmanagementapi.dto.response.MedicalRecordResponse
 import java.util.UUID
 
 object MedicalRecordUtils {
-    fun buildMedicalRecord() = MedicalRecord(
+    fun buildMedicalRecord() =
+        MedicalRecord(
             animalId = UUID.randomUUID(),
-            id = UUID.randomUUID()
+            id = UUID.randomUUID(),
         )
 
-    fun buildMedicalRecordResponse() = MedicalRecordResponse(
-        id = UUID.randomUUID(),
-        animalId = UUID.randomUUID()
-    )
+    fun buildMedicalRecordResponse() =
+        MedicalRecordResponse(
+            id = UUID.randomUUID(),
+            animalId = UUID.randomUUID(),
+        )
 
-    fun buildMedicalRecordRequest() = MedicalRecordRequest(
-        animalId = UUID.randomUUID(),
-        id = UUID.randomUUID()
-    )
+    fun buildMedicalRecordRequest() =
+        MedicalRecordRequest(
+            animalId = UUID.randomUUID(),
+            id = UUID.randomUUID(),
+        )
 }

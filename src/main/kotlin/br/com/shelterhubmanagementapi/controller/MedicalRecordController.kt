@@ -20,7 +20,7 @@ import java.util.UUID
 class MedicalRecordController(private val medicalRecordService: MedicalRecordService) {
     @GetMapping
     suspend fun getAll(): ResponseEntity<List<MedicalRecordResponse>> {
-        val medicalRecords = medicalRecordService.getAll()
+        val medicalRecords = medicalRecordService.getAll().await()
         return if (medicalRecords.isEmpty()) {
             ResponseEntity.notFound().build()
         } else {

@@ -29,7 +29,8 @@ class MedicalRecordControllerTest(
     private val PATH_URL = "/v1/medical-record"
 
     @MockkBean
-    private lateinit var  medicalRecordService: MedicalRecordService
+    private lateinit var medicalRecordService: MedicalRecordService
+
     @Test
     fun `should return all medical records`() {
         val firstMedicalRecord: MedicalRecordResponse =
@@ -38,7 +39,7 @@ class MedicalRecordControllerTest(
         val secondMedicalRecord: MedicalRecordResponse =
             MedicalRecordUtils.buildMedicalRecordResponse()
 
-        coEvery { medicalRecordService.getAll() } returns CompletableDeferred(List.of(firstMedicalRecord, secondMedicalRecord))
+        coEvery { medicalRecordService.getAll() } returns CompletableDeferred(listOf(firstMedicalRecord, secondMedicalRecord))
 
         webTestClient.get()
             .uri { it.path(PATH_URL).build() }
@@ -72,9 +73,10 @@ class MedicalRecordControllerTest(
 
         coEvery { medicalRecordService.getById(medicalRecordId) } returns CompletableDeferred(medicalResponse)
 
-        webTestClient.get().uri { uriBuilder -> uriBuilder
-            .path("$PATH_URL/{id}")
-            .build(medicalRecordId)
+        webTestClient.get().uri { uriBuilder ->
+            uriBuilder
+                .path("$PATH_URL/{id}")
+                .build(medicalRecordId)
         }.exchange()
             .expectStatus().isOk
             .expectBody<MedicalRecordResponse>()
@@ -91,7 +93,7 @@ class MedicalRecordControllerTest(
             .exchange()
             .expectStatus().isNotFound
 
-        coVerify(exactly = 1) {medicalRecordService.getAll() }
+        coVerify(exactly = 1) { medicalRecordService.getAll() }
     }
 
     @Test

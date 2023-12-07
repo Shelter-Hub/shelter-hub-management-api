@@ -43,3 +43,4 @@ lombok.config
 /certs
 
 postgres-data/
+.gradle
