@@ -18,7 +18,7 @@ data class AnimalRequest(
     val medicalRecordId: UUID?,
     val animalType: String,
     val gender: Gender,
-    val size: Size,
+    val size: Size
 )
 
 fun AnimalRequest.toAnimal() =
@@ -33,5 +33,5 @@ fun AnimalRequest.toAnimal() =
         medicalRecordId = this.medicalRecordId ?: throw NullPointerException(),
         animalType = AnimalType.getOrDefault(this.animalType),
         gender = this.gender,
-        size = this.size,
+        size = this.size
     )

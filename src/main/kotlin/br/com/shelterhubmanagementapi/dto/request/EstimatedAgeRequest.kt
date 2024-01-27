@@ -1,14 +1,11 @@
 package br.com.shelterhubmanagementapi.dto.request
 
-import kotlinx.datetime.LocalDate
-// import java.time.LocalDate
-import kotlinx.serialization.Serializable
+import java.time.LocalDate
 
-@Serializable
 data class EstimatedAgeRequest(
     val years: Int,
     val months: Int,
-    val days: Int,
+    val days: Int
 )
 
-fun EstimatedAgeRequest.toEstimatedAge(): LocalDate = LocalDate(this.years, this.months, this.days)
+fun EstimatedAgeRequest.toEstimatedAge(): LocalDate = LocalDate.of(this.years, this.months, this.days)

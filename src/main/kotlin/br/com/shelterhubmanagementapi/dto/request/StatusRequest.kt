@@ -4,22 +4,16 @@ import br.com.shelterhubmanagementapi.domain.model.Status
 import java.util.*
 
 data class StatusRequest(
-    val id: UUID ?= null,
-    val name: String,
+    val id: UUID ? = null,
+    val name: String
 )
 
 fun StatusRequest.toStatus() =
-    this.id?.let{
-        Status (
+    this.id?.let {
+        Status(
             id = it,
-            name = this.name,
+            name = this.name
         )
     } ?: Status(
-        name = this.name,
+        name = this.name
     )
-
-
-
-
-
-

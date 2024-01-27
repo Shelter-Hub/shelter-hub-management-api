@@ -1,11 +1,10 @@
 package br.com.shelterhubmanagementapi.dto.response
 
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
-class AnimalStatusResponse {
+data class AnimalStatusResponse(
     val id: Long,
     val animalId: UUID,
-    val createDate: LocalDate,
-    val statusId: UUID,
-}
+    val createDate: LocalDate
+)

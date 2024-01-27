@@ -30,7 +30,7 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
 
     @GetMapping("/{id}")
     suspend fun getById(
-        @PathVariable id: UUID,
+        @PathVariable id: UUID
     ): ResponseEntity<MedicalRecordResponse> {
         val medicalRecord = medicalRecordService.getById(id)
         return ResponseEntity.ok(medicalRecord.await())
@@ -38,7 +38,7 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
 
     @PostMapping
     suspend fun create(
-        @RequestBody medicalRecord: MedicalRecordRequest,
+        @RequestBody medicalRecord: MedicalRecordRequest
     ): ResponseEntity<MedicalRecordResponse> {
         val medicalResponse = medicalRecordService.create(medicalRecord)
         return ResponseEntity.ofNullable(medicalResponse.await())
@@ -47,7 +47,7 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
     @PutMapping("/{id}")
     suspend fun update(
         @PathVariable id: UUID,
-        @RequestBody medicalRecord: MedicalRecordRequest,
+        @RequestBody medicalRecord: MedicalRecordRequest
     ): ResponseEntity<MedicalRecordResponse> {
         val medicalRecordPersisted = medicalRecordService.update(medicalRecord, id)
         return ResponseEntity.ofNullable(medicalRecordPersisted.await())
@@ -55,7 +55,7 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
 
     @DeleteMapping("/{id}")
     suspend fun delete(
-        @PathVariable id: UUID,
+        @PathVariable id: UUID
     ): ResponseEntity<Void> {
         medicalRecordService.deleteById(id)
         return ResponseEntity.accepted().build()

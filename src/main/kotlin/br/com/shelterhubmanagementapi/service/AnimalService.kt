@@ -19,12 +19,12 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class AnimalService(
     private val animalRepository: AnimalRepository,
-    private val medicalRecordService: MedicalRecordService,
+    private val medicalRecordService: MedicalRecordService
 ) {
     private val log = LoggerFactory.getLogger(AnimalService::class.java)
 
@@ -49,7 +49,7 @@ class AnimalService(
 
     suspend fun updateById(
         animalRequest: AnimalRequest,
-        animalId: UUID,
+        animalId: UUID
     ): Pair<Deferred<Boolean>, Deferred<AnimalResponse>> {
         return coroutineScope {
             val animalExistsBefore =

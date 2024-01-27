@@ -7,18 +7,21 @@ import br.com.shelterhubmanagementapi.dto.response.StatusResponse
 import br.com.shelterhubmanagementapi.exception.PersistenceFailedException
 import br.com.shelterhubmanagementapi.exception.ResourceNotFoundException
 import br.com.shelterhubmanagementapi.repository.StatusRepository
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import org.springframework.stereotype.Service
 import java.util.*
 
-
 @Service
 class StatusService(
-    private val statusRepository: StatusRepository,
+    private val statusRepository: StatusRepository
 ) {
     private val log = LoggerFactory.getLogger(StatusService::class.java)
 
@@ -67,7 +70,7 @@ class StatusService(
             }
         }
 
-    suspend fun  deleteById(statusId: UUID) =
+    suspend fun deleteById(statusId: UUID) =
         coroutineScope {
             launch(Dispatchers.IO) {
                 val status = statusRepository.findById(statusId)
@@ -84,42 +87,3 @@ class StatusService(
             }
         }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

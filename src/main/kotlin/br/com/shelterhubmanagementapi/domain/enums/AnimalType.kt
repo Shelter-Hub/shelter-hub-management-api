@@ -6,7 +6,7 @@ enum class AnimalType {
     Bird,
     Reptile,
     OtherMammal,
-    Unknown,
+    Unknown
     ;
 
     companion object {

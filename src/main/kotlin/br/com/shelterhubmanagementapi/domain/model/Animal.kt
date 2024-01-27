@@ -4,7 +4,7 @@ import br.com.shelterhubmanagementapi.domain.enums.AnimalType
 import br.com.shelterhubmanagementapi.domain.enums.Gender
 import br.com.shelterhubmanagementapi.domain.enums.Size
 import br.com.shelterhubmanagementapi.dto.response.AnimalResponse
-import kotlinx.datetime.LocalDate
+import java.time.LocalDate
 import java.util.UUID
 
 data class Animal(
@@ -18,7 +18,7 @@ data class Animal(
     val medicalRecordId: UUID,
     val animalType: AnimalType,
     val gender: Gender,
-    val size: Size,
+    val size: Size
 )
 
 fun Animal.toResponse(): AnimalResponse =
@@ -33,5 +33,5 @@ fun Animal.toResponse(): AnimalResponse =
         medicalRecordId = this.medicalRecordId,
         animalType = this.animalType.toString(),
         gender = this.gender,
-        size = this.size,
+        size = this.size
     )

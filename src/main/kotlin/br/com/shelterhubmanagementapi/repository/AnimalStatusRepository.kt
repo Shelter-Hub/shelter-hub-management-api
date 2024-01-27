@@ -7,5 +7,5 @@ import org.springframework.stereotype.Component
 
 @Component
 interface AnimalStatusRepository :
-        CoroutineCrudRepository<AnimalStatus, Long>,
-        CoroutineSortingRepository<AnimalStatus, Long>
+    CoroutineCrudRepository<AnimalStatus, Long>,
+    CoroutineSortingRepository<AnimalStatus, Long>

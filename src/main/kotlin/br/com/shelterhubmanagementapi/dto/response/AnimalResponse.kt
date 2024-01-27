@@ -15,5 +15,5 @@ data class AnimalResponse(
     val medicalRecordId: UUID,
     val animalType: String,
     val gender: Gender,
-    val size: Size,
+    val size: Size
 )

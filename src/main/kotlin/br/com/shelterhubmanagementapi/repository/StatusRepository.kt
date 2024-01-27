@@ -8,5 +8,5 @@ import java.util.*
 
 @Component
 interface StatusRepository :
-        CoroutineCrudRepository<Status, UUID>,
-        CoroutineSortingRepository<Status, UUID>
+    CoroutineCrudRepository<Status, UUID>,
+    CoroutineSortingRepository<Status, UUID>

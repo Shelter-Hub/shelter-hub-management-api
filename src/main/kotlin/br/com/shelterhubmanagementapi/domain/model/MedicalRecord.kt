@@ -5,11 +5,11 @@ import java.util.UUID
 
 data class MedicalRecord(
     val id: UUID = UUID.randomUUID(),
-    val animalId: UUID,
+    val animalId: UUID
 )
 
 fun MedicalRecord.toResponse() =
     MedicalRecordResponse(
         id = this.id,
-        animalId = this.animalId,
+        animalId = this.animalId
     )

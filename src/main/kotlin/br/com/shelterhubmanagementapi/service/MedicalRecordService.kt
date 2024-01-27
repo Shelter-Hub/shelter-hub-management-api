@@ -23,7 +23,7 @@ import org.springframework.dao.DataAccessException
 import java.util.UUID
 
 class MedicalRecordService(
-    private val medicalRecordRepository: MedicalRecordRepository,
+    private val medicalRecordRepository: MedicalRecordRepository
 ) {
     private val log = LoggerFactory.getLogger(MedicalRecordService::class.java)
 
@@ -50,7 +50,7 @@ class MedicalRecordService(
 
     suspend fun update(
         medicalRecordRequest: MedicalRecordRequest,
-        uuid: UUID,
+        uuid: UUID
     ): Deferred<MedicalRecordResponse> =
         coroutineScope {
             async {
