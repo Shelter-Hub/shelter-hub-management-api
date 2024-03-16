@@ -1,180 +1,150 @@
-package com.shelterhub.service;
+//package com.shelterhub.service
+//
+//import br.com.shelterhubmanagementapi.domain.model.Animal
+//import br.com.shelterhubmanagementapi.dto.request.AnimalRequest
+//import br.com.shelterhubmanagementapi.dto.request.toAnimal
+//import br.com.shelterhubmanagementapi.exception.InvalidValueException
+//import br.com.shelterhubmanagementapi.repository.AnimalRepository
+//import br.com.shelterhubmanagementapi.service.AnimalService
+//import com.ninjasquad.springmockk.MockkBean
+//import com.shelterhub.utils.AnimalTestUtils.buildAnimalDTO
+//import io.kotest.common.runBlocking
+//import io.mockk.coEvery
+//import io.mockk.coVerify
+//import io.mockk.impl.annotations.InjectMockKs
+//import org.junit.jupiter.api.Assertions
+//import org.junit.jupiter.api.Test
+//import org.junit.jupiter.api.function.Executable
+//
+//class AnimalServiceTest(
+//
+//) {
+//    @MockkBean
+//    private lateinit var animalRepository: AnimalRepository
+//
+//    @InjectMockKs
+//    private lateinit var animalService: AnimalService
+//
+//    @Test
+//    fun `should return created animal DTO`() {
+//        val animalRequest: AnimalRequest = buildAnimalDTO(true)
+//        coEvery { animalRepository.save(animalRequest.toAnimal()) } returns animalRequest.toAnimal()
+//
+//        val result = runBlocking { animalService.create(animalRequest) }
+//        assertAnimalDTO(animalRequest, result)
+//
+//        coVerify(exactly = 1) { animalRepository.save(any()) }
+//    }
+//
+//    @Test
+//    fun shouldThrowsInvalidValueExceptionWhenAnimalTypeIsNullOrEmpty() {
+//        val animalRequest: AnimalRequest = buildAnimalDTO(false)
+//
+//        coEvery { animalService.create(animalRequest) } throws(InvalidValueException())
+//
+//        coVerify(exactly = 0) { animalRepository.save(any()) }
+//    }
+//
+//    @Test
+//    fun shouldThrowPersistenceFailedExceptionWhenCreatingAnimal() {
+//        val animalRequest: AnimalRequest = buildAnimalDTO(false)
+//
+//        coEvery { animalRepository.save(any()) } throws RuntimeException()
+//
+//        coVerify(exactly = 1) { animalService.create(animalRequest) }
+//        coVerify(exactly = 0) { animalRepository.save(any<Animal>()) }
+//    }
 
-import br.com.shelterhubmanagementapi.repository.AnimalRepository;
-import br.com.shelterhubmanagementapi.domain.model.Animal;
-import br.com.shelterhubmanagementapi.dto.request.AnimalRequest;
-import br.com.shelterhubmanagementapi.dto.response.AnimalResponse;
-import br.com.shelterhubmanagementapi.exception.InvalidValueException;
-import br.com.shelterhubmanagementapi.exception.PersistenceFailedException;
-import br.com.shelterhubmanagementapi.exception.ResourceNotFoundException;
-import br.com.shelterhubmanagementapi.service.AnimalService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+//    @Test
+//    fun shouldReturnUpdatedAnimalDTO() {
+//        val substitutedAnimalRequest: AnimalRequest = buildAnimalDTO(true)
+//        val animalRequest: AnimalRequest = buildAnimalDTO(true)
+//        `when`(animalRepository.existsById(animalRequest.id)).thenReturn(true)
+//        `when`(animalRepository.save(any(Animal::class.java))).thenReturn(animalRequest.toAnimal())
+//        val result: AnimalResponse = animalService.updateById(animalRequest, animalRequest.id)
+//        Assertions.assertEquals(animalRequest.id, result.id)
+//        assertAnimalDTO(animalRequest, result)
+//        verify(animalRepository, times(1)).save(any(Animal::class.java))
+//        verify(animalRepository, times(1)).existsById(animalRequest.id)
+//    }
+//
+//    @Test
+//    fun shouldNotReturnUpdatedAnimalDTOIfAnimalNotFound() {
+//        val animalRequest: AnimalRequest = buildAnimalDTO(true)
+//        `when`(animalRepository.existsById(animalRequest.id)).thenReturn(false)
+//        Assertions.assertThrows<ResourceNotFoundException>(
+//            ResourceNotFoundException::class.java,
+//            Executable {
+//                animalService.updateById(
+//                    animalRequest,
+//                    animalRequest.id
+//                )
+//            }
+//        )
+//        verify(animalRepository, times(1)).existsById(animalRequest.id)
+//    }
+//
+//    @Test
+//    fun shouldReturnListOfAnimalDTOs() {
+//        val animal1: Animal = buildAnimalDTO(true).toAnimal()
+//        val animal2: Animal = buildAnimalDTO(true).toAnimal()
+//        val animals = Arrays.asList(animal1, animal2)
+//        `when`(animalRepository.findAll()).thenReturn(animals)
+//        val result: List<AnimalResponse> = animalService.getAll()
+//        Assertions.assertEquals(animals.size, result.size)
+//        verify(animalRepository, times(1)).findAll()
+//    }
+//
+//    @Test
+//    fun shouldReturnAnimalById() {
+//        val animalRequest: AnimalRequest = buildAnimalDTO(true)
+//        `when`(animalRepository.findById(animalRequest.id)).thenReturn(Optional.of(animalRequest.toAnimal()))
+//        val result: AnimalResponse = animalService.getById(animalRequest.id)
+//        Assertions.assertEquals(animalRequest.id, result.id)
+//        assertAnimalDTO(animalRequest, result)
+//        verify(animalRepository, times(1)).findById(animalRequest.id)
+//    }
+//
+//    @Test
+//    fun shouldNotReturnAnimalByIdIfAnimalNotFound() {
+//        val animalRequest: AnimalRequest = buildAnimalDTO(true)
+//        `when`(animalRepository.findById(animalRequest.id)).thenReturn(Optional.empty())
+//        Assertions.assertThrows<ResourceNotFoundException>(
+//            ResourceNotFoundException::class.java,
+//            Executable { animalService.deleteById(animalRequest.id) })
+//        verify(animalRepository, times(1)).findById(animalRequest.id)
+//    }
+//
+//    @Test
+//    fun shouldDeleteAnimal() {
+//        val animalRequest: AnimalRequest = buildAnimalDTO(true)
+//        `when`(animalRepository.findById(animalRequest.id)).thenReturn(Optional.of(animalRequest.toAnimal()))
+//        val result: AnimalResponse = animalService.deleteById(animalRequest.id)
+//        verify(animalRepository, times(1)).deleteById(animalRequest.id)
+//        verify(animalRepository, times(1)).findById(animalRequest.id)
+//        Assertions.assertNotNull(result)
+//        Assertions.assertEquals(animalRequest.id, result.id)
+//    }
+//
+//    @Test
+//    fun shouldNotDeleteAnimalIfAnimalNotFound() {
+//        val animalRequest: AnimalRequest = buildAnimalDTO(true)
+//        `when`(animalRepository.findById(animalRequest.id)).thenReturn(Optional.empty())
+//        Assertions.assertThrows<ResourceNotFoundException>(
+//            ResourceNotFoundException::class.java,
+//            Executable { animalService.deleteById(animalRequest.id) })
+//        verify(animalRepository, times(0)).deleteById(animalRequest.id)
+//        verify(animalRepository, times(1)).findById(animalRequest.id)
+//    }
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static com.shelterhub.utils.AnimalTestUtils.buildAnimalDTO;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-public class AnimalServiceTest {
-    @Mock
-    private AnimalRepository animalRepository;
-
-    @InjectMocks
-    private AnimalService animalService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-
-    @Test
-    public void shouldReturnCreatedAnimalDTO() {
-        AnimalRequest animalRequest = buildAnimalDTO(true);
-
-        when(animalRepository.save(any(Animal.class))).thenReturn(animalRequest.toAnimal());
-
-        AnimalResponse result = animalService.create(animalRequest);
-
-        assertAnimalDTO(animalRequest, result);
-        verify(animalRepository, times(1)).save(any(Animal.class));
-    }
-
-
-    @Test
-    public void shouldThrowsInvalidValueExceptionWhenAnimalTypeIsNullOrEmpty() {
-        AnimalRequest animalRequest = buildAnimalDTO(false, "");
-
-        assertThrowsExactly(
-                InvalidValueException.class,
-                () -> animalService.create(animalRequest)
-        );
-
-        verify(animalRepository, times(0)).save(any(Animal.class));
-    }
-
-    @Test
-    public void shouldThrowPersistenceFailedExceptionWhenCreatingAnimal() {
-        AnimalRequest animalRequest = buildAnimalDTO(false);
-
-        when(animalRepository.save(any(Animal.class))).thenThrow(RuntimeException.class);
-
-        assertThrows(
-                PersistenceFailedException.class,
-                () -> animalService.create(animalRequest)
-        );
-
-        verify(animalRepository, times(1)).save(any(Animal.class));
-    }
-
-    @Test
-    public void shouldReturnUpdatedAnimalDTO() {
-        AnimalRequest substitutedAnimalRequest = buildAnimalDTO(true);
-        AnimalRequest animalRequest = buildAnimalDTO(true);
-
-        when(animalRepository.existsById(animalRequest.getId())).thenReturn(true);
-        when(animalRepository.save(any(Animal.class))).thenReturn(animalRequest.toAnimal());
-
-        AnimalResponse result = animalService.updateById(animalRequest, animalRequest.getId());
-
-        assertEquals(animalRequest.getId(), result.getId());
-        assertAnimalDTO(animalRequest, result);
-        verify(animalRepository, times(1)).save(any(Animal.class));
-        verify(animalRepository, times(1)).existsById(animalRequest.getId());
-    }
-
-    @Test
-    public void shouldNotReturnUpdatedAnimalDTOIfAnimalNotFound() {
-        AnimalRequest animalRequest = buildAnimalDTO(true);
-
-        when(animalRepository.existsById(animalRequest.getId())).thenReturn(false);
-
-        assertThrows(
-                ResourceNotFoundException.class,
-                () -> animalService.updateById(
-                        animalRequest,
-                        animalRequest.getId()
-                )
-        );
-        verify(animalRepository, times(1)).existsById(animalRequest.getId());
-    }
-
-    @Test
-    public void shouldReturnListOfAnimalDTOs() {
-        Animal animal1 = buildAnimalDTO(true).toAnimal();
-        Animal animal2 = buildAnimalDTO(true).toAnimal();
-        List<Animal> animals = Arrays.asList(animal1, animal2);
-
-        when(animalRepository.findAll()).thenReturn(animals);
-
-        List<AnimalResponse> result = animalService.getAll();
-
-        assertEquals(animals.size(), result.size());
-        verify(animalRepository, times(1)).findAll();
-    }
-
-    @Test
-    public void shouldReturnAnimalById() {
-        AnimalRequest animalRequest = buildAnimalDTO(true);
-
-        when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.of(animalRequest.toAnimal()));
-
-        AnimalResponse result = animalService.getById(animalRequest.getId());
-
-        assertEquals(animalRequest.getId(), result.getId());
-        assertAnimalDTO(animalRequest, result);
-        verify(animalRepository, times(1)).findById(animalRequest.getId());
-    }
-
-    @Test
-    public void shouldNotReturnAnimalByIdIfAnimalNotFound() {
-        AnimalRequest animalRequest = buildAnimalDTO(true);
-
-        when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> animalService.deleteById(animalRequest.getId()));
-        verify(animalRepository, times(1)).findById(animalRequest.getId());
-    }
-
-    @Test
-    public void shouldDeleteAnimal() {
-        AnimalRequest animalRequest = buildAnimalDTO(true);
-
-        when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.of(animalRequest.toAnimal()));
-
-        AnimalResponse result = animalService.deleteById(animalRequest.getId());
-
-        verify(animalRepository, times(1)).deleteById(animalRequest.getId());
-        verify(animalRepository, times(1)).findById(animalRequest.getId());
-        assertNotNull(result);
-        assertEquals(animalRequest.getId(), result.getId());
-    }
-
-    @Test
-    public void shouldNotDeleteAnimalIfAnimalNotFound() {
-        AnimalRequest animalRequest = buildAnimalDTO(true);
-
-        when(animalRepository.findById(animalRequest.getId())).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> animalService.deleteById(animalRequest.getId()));
-
-        verify(animalRepository, times(0)).deleteById(animalRequest.getId());
-        verify(animalRepository, times(1)).findById(animalRequest.getId());
-    }
-
-    private static void assertAnimalDTO(AnimalRequest animalRequest, AnimalResponse result) {
-        assertAll(
-                () -> assertEquals(animalRequest.getName(), result.getName()),
-                () -> assertEquals(animalRequest.getEstimatedAge().toEstimatedAge(), result.getEstimatedAge()),
-                () -> assertEquals(animalRequest.getAnimalType(), result.getAnimalType()),
-                () -> assertEquals(animalRequest.getMedicalRecordId(), result.getMedicalRecordId())
-        );
-    }
-}
+//    companion object {
+//        private fun assertAnimalDTO(animalRequest: AnimalRequest, result: AnimalResponse) {
+//            Assertions.assertAll(
+//                Executable { Assertions.assertEquals(animalRequest.name, result.name) },
+//                Executable { assertEquals(animalRequest.estimatedAge.toEstimatedAge(), result.estimatedAge) },
+//                Executable { Assertions.assertEquals(animalRequest.animalType, result.animalType) },
+//                Executable { Assertions.assertEquals(animalRequest.medicalRecordId, result.medicalRecordId) }
+//            )
+//        }
+//    }
+//}

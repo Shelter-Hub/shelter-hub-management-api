@@ -6,7 +6,6 @@ import br.com.shelterhubmanagementapi.service.AnimalService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -59,8 +58,7 @@ class AnimalController(private val animalService: AnimalService) {
     @PutMapping("/{id}")
     suspend fun updateAnimal(
         @PathVariable id: UUID,
-        @RequestBody animal: AnimalRequest,
-        serverHttpRequest: ServerHttpRequest,
+        @RequestBody animal: AnimalRequest
     ): ResponseEntity<Any> {
         val (animalExistsBefore, savedAnimal) = animalService.updateById(animal, id)
         return ResponseEntity.ok(savedAnimal.await())

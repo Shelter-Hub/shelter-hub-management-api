@@ -28,7 +28,7 @@ import java.util.UUID
 @WebFluxTest(controllers = [AnimalController::class])
 @ContextConfiguration(classes = [AnimalController::class, AnimalService::class, GlobalExceptionHandler::class])
 class AnimalControllerTest(
-    @Autowired private val webTestClient: WebTestClient,
+        @Autowired private val webTestClient: WebTestClient,
 ) {
     @MockkBean
     private lateinit var animalService: AnimalService

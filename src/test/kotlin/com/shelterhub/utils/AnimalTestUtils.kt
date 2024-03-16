@@ -26,7 +26,7 @@ object AnimalTestUtils {
         )
     }
 
-    fun buildAnimalDTO(animalType: String?): AnimalRequest {
+    fun buildAnimalDTO(animalType: Boolean): AnimalRequest {
         val faker = Faker()
 
         return AnimalRequest(
