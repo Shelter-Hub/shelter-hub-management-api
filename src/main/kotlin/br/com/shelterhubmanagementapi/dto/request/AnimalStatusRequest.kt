@@ -2,7 +2,7 @@ package br.com.shelterhubmanagementapi.dto.request
 
 import br.com.shelterhubmanagementapi.domain.model.AnimalStatus
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 data class AnimalStatusRequest(
     val id: Long,

@@ -1,7 +1,7 @@
 package br.com.shelterhubmanagementapi.dto.request
 
 import br.com.shelterhubmanagementapi.domain.model.Status
-import java.util.*
+import java.util.UUID
 
 data class StatusRequest(
     val id: UUID ? = null,

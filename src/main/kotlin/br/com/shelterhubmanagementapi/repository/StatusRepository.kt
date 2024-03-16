@@ -4,7 +4,7 @@ import br.com.shelterhubmanagementapi.domain.model.Status
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.data.repository.kotlin.CoroutineSortingRepository
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 @Component
 interface StatusRepository :
