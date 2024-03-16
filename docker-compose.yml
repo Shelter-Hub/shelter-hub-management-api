@@ -10,9 +10,10 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - postgres-compose-network
+
   local-pgadmin-compose:
     image: dpage/pgadmin4
     environment:
@@ -32,3 +33,6 @@ services:
 networks:
   postgres-compose-network:
     driver: bridge
+
+volumes:
+  postgres-data:

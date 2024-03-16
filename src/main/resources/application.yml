@@ -1,9 +1,9 @@
 server:
   http2:
-    enabled: true
+    enabled: false
   port: '8080'
   ssl:
-    enabled: true
+    enabled: false
     key-store: '${TLS_KEYSTORE_PATH:certs/sh_keystore.jks}'
     key-store-password: '${TLS_KEYSTORE_SECRET:secret}'
 
