@@ -14,8 +14,8 @@ object MedicalRecordUtils {
 
     fun buildMedicalRecordResponse() =
         MedicalRecordResponse(
-            id = UUID.randomUUID(),
-            animalId = UUID.randomUUID(),
+            id = UUID.randomUUID().toString(),
+            animalId = UUID.randomUUID().toString(),
         )
 
     fun buildMedicalRecordRequest() =

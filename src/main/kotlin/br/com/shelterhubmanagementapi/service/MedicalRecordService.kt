@@ -19,8 +19,10 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import org.springframework.dao.DataAccessException
+import org.springframework.stereotype.Service
 import java.util.UUID
 
+@Service
 class MedicalRecordService(
     private val medicalRecordRepository: MedicalRecordRepository,
 ) {
@@ -33,7 +35,8 @@ class MedicalRecordService(
                     val medicalRecord: MedicalRecord =
                         medicalRecordRepository.save(medicalRecordRequest.toMedicalRecord())
 
-                    log.makeLoggingEventBuilder(Level.INFO)
+                    log
+                        .makeLoggingEventBuilder(Level.INFO)
                         .setMessage("Medical record was saved with success.")
                         .addKeyValue("medicalRecordId", medicalRecord.id.toString())
                         .log()
@@ -55,8 +58,9 @@ class MedicalRecordService(
             async {
                 try {
                     val medicalRecord: MedicalRecord = medicalRecordRequest.toMedicalRecord()
-                    val medicalRecordResult = medicalRecordRepository.save(medicalRecord.copy(uuid))
-                    log.makeLoggingEventBuilder(Level.INFO)
+                    val medicalRecordResult = medicalRecordRepository.save(medicalRecord.copy(id = uuid))
+                    log
+                        .makeLoggingEventBuilder(Level.INFO)
                         .setMessage("Medical record was updated with success.")
                         .addKeyValue("medicalRecordId", medicalRecord.id.toString())
                         .log()
@@ -89,11 +93,12 @@ class MedicalRecordService(
             }
         }
 
-    suspend fun deleteById(id: UUID) =
+    suspend fun deleteById(id: String) =
         coroutineScope {
             launch(Dispatchers.IO) {
-                medicalRecordRepository.deleteById(id)
-                log.makeLoggingEventBuilder(Level.INFO)
+                medicalRecordRepository.deleteById(UUID.fromString(id))
+                log
+                    .makeLoggingEventBuilder(Level.INFO)
                     .setMessage("Medical record was deleted with success.")
                     .addKeyValue("medicalRecordId", id)
                     .log()

@@ -17,7 +17,9 @@ import java.util.UUID
 
 @RestController
 @RequestMapping(value = ["/v1/medical-record"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class MedicalRecordController(private val medicalRecordService: MedicalRecordService) {
+class MedicalRecordController(
+    private val medicalRecordService: MedicalRecordService,
+) {
     @GetMapping
     suspend fun getAll(): ResponseEntity<List<MedicalRecordResponse>> {
         val medicalRecords = medicalRecordService.getAll().await()
@@ -55,7 +57,7 @@ class MedicalRecordController(private val medicalRecordService: MedicalRecordSer
 
     @DeleteMapping("/{id}")
     suspend fun delete(
-        @PathVariable id: UUID,
+        @PathVariable id: String,
     ): ResponseEntity<Void> {
         medicalRecordService.deleteById(id)
         return ResponseEntity.accepted().build()

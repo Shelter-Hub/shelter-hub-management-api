@@ -36,7 +36,8 @@ class AnimalService(
                 }
                 try {
                     val createdAnimal = animalRepository.save(animalRequest.toAnimal())
-                    log.makeLoggingEventBuilder(Level.INFO)
+                    log
+                        .makeLoggingEventBuilder(Level.INFO)
                         .setMessage("Animal was saved with success.")
                         .addKeyValue("animalId", createdAnimal.id)
                         .log()
@@ -50,20 +51,13 @@ class AnimalService(
     suspend fun updateById(
         animalRequest: AnimalRequest,
         animalId: UUID,
-    ): Pair<Deferred<Boolean>, Deferred<AnimalResponse>> {
-        return coroutineScope {
-            val animalExistsBefore =
-                async(Dispatchers.IO) {
-                    animalRepository.existsById(animalId)
-                }
-            val savedAnimal =
-                async(Dispatchers.IO) {
-                    val animal: Animal = animalRequest.toAnimal()
-                    animalRepository.save(animal).toResponse()
-                }
-            Pair(animalExistsBefore, savedAnimal)
+    ): Deferred<AnimalResponse> =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                val animal: Animal = animalRequest.toAnimal()
+                animalRepository.save(animal).toResponse()
+            }
         }
-    }
 
     suspend fun getAll(): Deferred<List<AnimalResponse>> =
         coroutineScope {
@@ -83,21 +77,21 @@ class AnimalService(
             }
         }
 
-    suspend fun deleteById(animalId: UUID) =
+    suspend fun deleteById(animalId: UUID) {
         coroutineScope {
             launch(Dispatchers.IO) {
                 val animal = animalRepository.findById(animalId)
                 animal?.let {
                     animalRepository.deleteById(it.id)
-                    medicalRecordService.deleteById(it.medicalRecordId)
+                    medicalRecordService.deleteById(it.medicalRecordId.toString())
 
-                    log.makeLoggingEventBuilder(Level.INFO)
+                    log
+                        .makeLoggingEventBuilder(Level.INFO)
                         .setMessage("Animal was deleted with success with its medicalRecord.")
                         .addKeyValue("animalId", animal.id.toString())
                         .log()
-
-                    it.toResponse()
                 } ?: throw ResourceNotFoundException()
             }
         }
+    }
 }

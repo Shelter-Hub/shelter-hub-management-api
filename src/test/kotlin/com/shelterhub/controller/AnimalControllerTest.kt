@@ -12,6 +12,7 @@ import com.ninjasquad.springmockk.MockkBean
 import com.shelterhub.utils.AnimalTestUtils
 import io.mockk.Called
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import kotlinx.coroutines.CompletableDeferred
 import net.datafaker.Faker
@@ -28,26 +29,30 @@ import java.util.UUID
 @WebFluxTest(controllers = [AnimalController::class])
 @ContextConfiguration(classes = [AnimalController::class, AnimalService::class, GlobalExceptionHandler::class])
 class AnimalControllerTest(
-        @Autowired private val webTestClient: WebTestClient,
+    @Autowired private val webTestClient: WebTestClient,
 ) {
     @MockkBean
     private lateinit var animalService: AnimalService
 
-    private val PATH_URL = "/v1/animal"
+    private val pathUrl = "/v1/animal"
 
     @Test
     fun `should return animal by id`() {
         val animalRequest = AnimalTestUtils.buildAnimalDTO()
         val animalId = animalRequest.id
         val animalResponse: AnimalResponse =
-            animalRequest.toAnimal()
+            animalRequest
+                .toAnimal()
                 .toResponse()
 
         coEvery { animalService.getById(animalId) } returns CompletableDeferred(animalResponse)
 
-        webTestClient.get().uri { uriBuilder -> uriBuilder.path("$PATH_URL/{id}").build(animalId) }
+        webTestClient
+            .get()
+            .uri { uriBuilder -> uriBuilder.path("$pathUrl/{id}").build(animalId) }
             .exchange()
-            .expectStatus().isOk
+            .expectStatus()
+            .isOk
             .expectBody<AnimalResponse>()
 
         coVerify { animalService.getById(animalId) wasNot Called }
@@ -59,28 +64,30 @@ class AnimalControllerTest(
 
         coEvery { animalService.getById(animalId) } throws ResourceNotFoundException()
 
-        webTestClient.get()
+        webTestClient
+            .get()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$PATH_URL/{id}")
+                    .path("$pathUrl/{id}")
                     .build(animalId)
-            }
-            .exchange()
-            .expectStatus().value { HttpStatus.NOT_FOUND }
+            }.exchange()
+            .expectStatus()
+            .value { HttpStatus.NOT_FOUND }
 
         coVerify { animalService.getById(animalId) wasNot Called }
     }
 
     @Test
     fun `should not get animal by id if UUID is null`() {
-        webTestClient.get()
+        webTestClient
+            .get()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$PATH_URL/{id}")
+                    .path("$pathUrl/{id}")
                     .build(null)
-            }
-            .exchange()
-            .expectStatus().isNotFound
+            }.exchange()
+            .expectStatus()
+            .isNotFound
     }
 
     @Test
@@ -90,11 +97,14 @@ class AnimalControllerTest(
 
         coEvery { animalService.getAll() } returns CompletableDeferred(listOf(firstAnimal, secondAnimal))
 
-        webTestClient.get()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .get()
+            .uri { it.path(pathUrl).build() }
             .exchange()
-            .expectStatus().isOk
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
+            .expectStatus()
+            .isOk
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
             .expectBody<List<AnimalResponse>>()
 
         coVerify(exactly = 1) { animalService.getAll() }
@@ -105,10 +115,12 @@ class AnimalControllerTest(
     fun `should return not found when all animals does not exist`() {
         coEvery { animalService.getAll() } returns CompletableDeferred(emptyList())
 
-        webTestClient.get()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .get()
+            .uri { it.path(pathUrl).build() }
             .exchange()
-            .expectStatus().isNotFound
+            .expectStatus()
+            .isNotFound
 
         coVerify(exactly = 1) { animalService.getAll() }
         coVerify { animalService.getAll() wasNot Called }
@@ -122,12 +134,15 @@ class AnimalControllerTest(
 
         coEvery { animalService.create(animalRequest) } returns CompletableDeferred(animalResponse)
 
-        webTestClient.post()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .post()
+            .uri { it.path(pathUrl).build() }
             .bodyValue(animalRequest)
             .exchange()
-            .expectStatus().isCreated
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
+            .expectStatus()
+            .isCreated
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
             .expectBody<AnimalResponse>()
 
         coVerify(exactly = 1) { animalService.create(animalRequest) }
@@ -142,12 +157,14 @@ class AnimalControllerTest(
                 .writeValueAsString(animalRequest)
                 .replace("\"size\":\"" + animalRequest.size + "\"", "\"size\":\"$invalidSize\"")
 
-        webTestClient.post()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .post()
+            .uri { it.path(pathUrl).build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(invalidJsonPayload)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus()
+            .isBadRequest
     }
 
     @Test
@@ -161,12 +178,14 @@ class AnimalControllerTest(
                     "\"gender\":\"" + animalRequest.gender + "\"",
                     "\"gender\":\"$invalidGender\"",
                 )
-        webTestClient.post()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .post()
+            .uri { it.path(pathUrl).build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(invalidJsonPayload)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus()
+            .isBadRequest
     }
 
     @Test
@@ -176,22 +195,20 @@ class AnimalControllerTest(
         val animalEntity = animalRequest.toAnimal()
         val animalResponse = animalEntity.toResponse()
 
-        coEvery { animalService.updateById(animalRequest, id) } returns
-            Pair(
-                CompletableDeferred(true),
-                CompletableDeferred(animalResponse),
-            )
+        coEvery { animalService.updateById(animalRequest, id) } returns CompletableDeferred(animalResponse)
 
-        webTestClient.put()
+        webTestClient
+            .put()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$PATH_URL/{id}")
+                    .path("$pathUrl/{id}")
                     .build(id)
-            }
-            .bodyValue(animalRequest)
+            }.bodyValue(animalRequest)
             .exchange()
-            .expectStatus().isOk
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
+            .expectStatus()
+            .isOk
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
             .expectBody<AnimalResponse>()
 
         coVerify(exactly = 1) { animalService.updateById(animalRequest, id) }
@@ -204,15 +221,16 @@ class AnimalControllerTest(
 
         coEvery { animalService.updateById(animalRequest, id) } throws ResourceNotFoundException()
 
-        webTestClient.put()
+        webTestClient
+            .put()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$PATH_URL/{id}")
+                    .path("$pathUrl/{id}")
                     .build(id)
-            }
-            .bodyValue(animalRequest)
+            }.bodyValue(animalRequest)
             .exchange()
-            .expectStatus().isNotFound
+            .expectStatus()
+            .isNotFound
             .expectBody<AnimalResponse>()
 
         coVerify(exactly = 1) { animalService.updateById(animalRequest, id) }
@@ -221,20 +239,18 @@ class AnimalControllerTest(
     @Test
     fun `should delete animal`() {
         val id = UUID.randomUUID()
-        val animalRequest = AnimalTestUtils.buildAnimalDTO().copy(id = id)
-        val animalEntity = animalRequest.toAnimal()
-        val animalResponse = animalEntity.toResponse()
 
-        coEvery { animalService.deleteById(id) } returns CompletableDeferred(animalResponse)
+        coJustRun { animalService.deleteById(id) }
 
-        webTestClient.delete()
+        webTestClient
+            .delete()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$PATH_URL/{id}")
+                    .path("$pathUrl/{id}")
                     .build(id)
-            }
-            .exchange()
-            .expectStatus().isNoContent
+            }.exchange()
+            .expectStatus()
+            .isNoContent
 
         coVerify(exactly = 1) { animalService.deleteById(id) }
     }
@@ -245,14 +261,15 @@ class AnimalControllerTest(
 
         coEvery { animalService.deleteById(id) } throws ResourceNotFoundException()
 
-        webTestClient.delete()
+        webTestClient
+            .delete()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$PATH_URL/{id}")
+                    .path("$pathUrl/{id}")
                     .build(id)
-            }
-            .exchange()
-            .expectStatus().isNotFound
+            }.exchange()
+            .expectStatus()
+            .isNotFound
 
         coVerify(exactly = 1) { animalService.deleteById(id) }
     }

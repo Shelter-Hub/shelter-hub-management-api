@@ -10,6 +10,6 @@ data class MedicalRecord(
 
 fun MedicalRecord.toResponse() =
     MedicalRecordResponse(
-        id = this.id,
-        animalId = this.animalId,
+        id = this.id.toString(),
+        animalId = this.animalId.toString(),
     )

@@ -32,11 +32,10 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException::class)
-    fun handleResourceNotFoundException(): ResponseEntity<ErrorResponse> {
-        return ResponseEntity
+    fun handleResourceNotFoundException(): ResponseEntity<ErrorResponse> =
+        ResponseEntity
             .notFound()
             .build()
-    }
 
     @ExceptionHandler(NotUpdatableException::class)
     fun handleConstraintViolationException(ex: NotUpdatableException): ResponseEntity<ErrorResponse> {

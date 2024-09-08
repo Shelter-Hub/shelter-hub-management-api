@@ -20,14 +20,14 @@ import java.util.UUID
 
 @RestController
 @RequestMapping(value = ["v1/animal"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class AnimalController(private val animalService: AnimalService) {
+class AnimalController(
+    private val animalService: AnimalService,
+) {
     @GetMapping("/{id}")
     @ResponseBody
     suspend fun getById(
         @PathVariable id: UUID,
-    ): AnimalResponse {
-        return animalService.getById(id).await()
-    }
+    ): AnimalResponse = animalService.getById(id).await()
 
     @GetMapping
     suspend fun getAll(): ResponseEntity<List<AnimalResponse>> {
@@ -46,7 +46,7 @@ class AnimalController(private val animalService: AnimalService) {
         @RequestBody animalRequest: AnimalRequest,
     ): ResponseEntity<AnimalResponse> {
         val animal = animalService.create(animalRequest).await()
-        val id = animal.id.toString()
+        val id = animal.id
         val location = URI.create(id)
 
         return ResponseEntity
@@ -58,9 +58,9 @@ class AnimalController(private val animalService: AnimalService) {
     @PutMapping("/{id}")
     suspend fun updateAnimal(
         @PathVariable id: UUID,
-        @RequestBody animal: AnimalRequest
+        @RequestBody animal: AnimalRequest,
     ): ResponseEntity<Any> {
-        val (animalExistsBefore, savedAnimal) = animalService.updateById(animal, id)
+        val savedAnimal = animalService.updateById(animal, id)
         return ResponseEntity.ok(savedAnimal.await())
     }
 

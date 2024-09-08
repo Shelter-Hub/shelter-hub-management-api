@@ -3,7 +3,6 @@ package com.shelterhub.controller
 import br.com.shelterhubmanagementapi.controller.MedicalRecordController
 import br.com.shelterhubmanagementapi.domain.model.toResponse
 import br.com.shelterhubmanagementapi.dto.request.toMedicalRecord
-import br.com.shelterhubmanagementapi.dto.response.AnimalResponse
 import br.com.shelterhubmanagementapi.dto.response.MedicalRecordResponse
 import br.com.shelterhubmanagementapi.exception.GlobalExceptionHandler
 import br.com.shelterhubmanagementapi.service.MedicalRecordService
@@ -13,7 +12,6 @@ import io.mockk.Called
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.Job
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,7 +26,7 @@ import org.springframework.test.web.reactive.server.expectBody
 class MedicalRecordControllerTest(
     @Autowired private val webTestClient: WebTestClient,
 ) {
-    private val PATH_URL = "/v1/medical-record"
+    private val pathUrl = "/v1/medical-record"
 
     @MockkBean
     private lateinit var medicalRecordService: MedicalRecordService
@@ -43,11 +41,14 @@ class MedicalRecordControllerTest(
 
         coEvery { medicalRecordService.getAll() } returns CompletableDeferred(listOf(firstMedicalRecord, secondMedicalRecord))
 
-        webTestClient.get()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .get()
+            .uri { it.path(pathUrl).build() }
             .exchange()
-            .expectStatus().isOk
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
+            .expectStatus()
+            .isOk
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
             .expectBody<List<MedicalRecordResponse>>()
 
         coVerify(exactly = 1) { medicalRecordService.getAll() }
@@ -58,10 +59,12 @@ class MedicalRecordControllerTest(
     fun `should return not found when all medical records does not exist`() {
         coEvery { medicalRecordService.getAll() } returns CompletableDeferred(emptyList())
 
-        webTestClient.get()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .get()
+            .uri { it.path(pathUrl).build() }
             .exchange()
-            .expectStatus().isNotFound
+            .expectStatus()
+            .isNotFound
 
         coVerify(exactly = 1) { medicalRecordService.getAll() }
         coVerify { medicalRecordService.getAll() wasNot Called }
@@ -75,12 +78,15 @@ class MedicalRecordControllerTest(
 
         coEvery { medicalRecordService.getById(medicalRecordId) } returns CompletableDeferred(medicalResponse)
 
-        webTestClient.get().uri { uriBuilder ->
-            uriBuilder
-                .path("$PATH_URL/{id}")
-                .build(medicalRecordId)
-        }.exchange()
-            .expectStatus().isOk
+        webTestClient
+            .get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("$pathUrl/{id}")
+                    .build(medicalRecordId)
+            }.exchange()
+            .expectStatus()
+            .isOk
             .expectBody<MedicalRecordResponse>()
 
         coVerify { medicalRecordService.getById(medicalRecordId) wasNot Called }
@@ -90,10 +96,12 @@ class MedicalRecordControllerTest(
     fun `should return not found when medical record does not exist`() {
         coEvery { medicalRecordService.getAll() } returns CompletableDeferred(emptyList())
 
-        webTestClient.get()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .get()
+            .uri { it.path(pathUrl).build() }
             .exchange()
-            .expectStatus().isNotFound
+            .expectStatus()
+            .isNotFound
 
         coVerify(exactly = 1) { medicalRecordService.getAll() }
     }
@@ -106,12 +114,15 @@ class MedicalRecordControllerTest(
 
         coEvery { medicalRecordService.create(medicalRecordRequest) } returns CompletableDeferred(medicalRecordResponse)
 
-        webTestClient.post()
-            .uri { it.path(PATH_URL).build() }
+        webTestClient
+            .post()
+            .uri { it.path(pathUrl).build() }
             .bodyValue(medicalRecordRequest)
             .exchange()
-            .expectStatus().isOk
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
+            .expectStatus()
+            .isOk
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
             .expectBody<MedicalRecordResponse>()
 
         coVerify(exactly = 1) { medicalRecordService.create(medicalRecordRequest) }
@@ -126,11 +137,13 @@ class MedicalRecordControllerTest(
 
         coEvery { medicalRecordService.update(medicalRecordRequest, medicalRecordId) } returns CompletableDeferred(medicalRecordResponse)
 
-        webTestClient.put()
-            .uri { it.path("$PATH_URL/{id}").build(medicalRecordId) }
+        webTestClient
+            .put()
+            .uri { it.path("$pathUrl/{id}").build(medicalRecordId) }
             .bodyValue(medicalRecordResponse)
             .exchange()
-            .expectStatus().isOk
+            .expectStatus()
+            .isOk
             .expectHeader()
             .contentType(MediaType.APPLICATION_JSON)
             .expectBody<MedicalRecordResponse>()
@@ -142,16 +155,18 @@ class MedicalRecordControllerTest(
     fun `should delete medical record successfully`() {
         val medicalRecordId = MedicalRecordUtils.buildMedicalRecord().id
 
-        coEvery { medicalRecordService.deleteById(medicalRecordId) } returns Job()
+        coEvery { medicalRecordService.deleteById(medicalRecordId.toString()) } returns Job()
 
-        webTestClient.delete()
+        webTestClient
+            .delete()
             .uri { uriBuilder ->
                 uriBuilder
-                    .path("$PATH_URL/{id}")
+                    .path("$pathUrl/{id}")
                     .build(medicalRecordId)
             }.exchange()
-            .expectStatus().isAccepted
+            .expectStatus()
+            .isAccepted
 
-        coVerify(exactly = 1) { medicalRecordService.deleteById(medicalRecordId) }
+        coVerify(exactly = 1) { medicalRecordService.deleteById(medicalRecordId.toString()) }
     }
 }

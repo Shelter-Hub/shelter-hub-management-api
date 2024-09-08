@@ -26,7 +26,7 @@ object AnimalTestUtils {
         )
     }
 
-    fun buildAnimalDTO(animalType: Boolean): AnimalRequest {
+    fun buildAnimalDTO(animalType: String): AnimalRequest {
         val faker = Faker()
 
         return AnimalRequest(
@@ -37,7 +37,7 @@ object AnimalTestUtils {
             history = faker.dog().memePhrase(),
             estimatedAge = EstimatedAgeRequest(years = 2, months = 5, days = 20),
             medicalRecordId = UUID.randomUUID(),
-            animalType = AnimalType.Canine.toString(),
+            animalType = animalType,
             gender = Gender.FEMALE,
             size = Size.SMALL,
         )
